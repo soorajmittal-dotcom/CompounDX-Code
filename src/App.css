@@ -2,7 +2,8 @@
    PartyPlanner – Full Styles
    ============================ */
 
-:root {
+:root,
+[data-theme='dark'] {
   --primary: #7c3aed;
   --primary-light: #a78bfa;
   --primary-dark: #5b21b6;
@@ -22,6 +23,18 @@
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='light'] {
+  --bg: #f8f7ff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f3f0ff;
+  --bg-input: #f0eef5;
+  --text: #1a1a2e;
+  --text-muted: #5a5a72;
+  --text-dim: #8a8aa0;
+  --border: #e0dff0;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -1702,6 +1715,198 @@ body {
   .summary-header {
     flex-direction: column;
   }
+}
+
+/* --- Theme Toggle --- */
+
+.theme-toggle {
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.header-content {
+  position: relative;
+}
+
+/* --- Recipe Modal --- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.modal-close:hover {
+  background: var(--danger);
+  color: white;
+  border-color: var(--danger);
+}
+
+.modal h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  padding-right: 2rem;
+}
+
+.recipe-desc {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.recipe-meta-bar {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.recipe-meta-bar span {
+  background: var(--bg-input);
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.recipe-section {
+  margin-bottom: 1.5rem;
+}
+
+.recipe-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-light);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.recipe-ingredients {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.35rem;
+}
+
+.recipe-ingredients li {
+  font-size: 0.85rem;
+  color: var(--text);
+  padding: 0.25rem 0;
+}
+
+.recipe-ingredients li::before {
+  content: '• ';
+  color: var(--accent);
+}
+
+.recipe-steps {
+  padding-left: 1.25rem;
+}
+
+.recipe-steps li {
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.6rem;
+  line-height: 1.5;
+}
+
+.recipe-steps li::marker {
+  color: var(--primary-light);
+  font-weight: 700;
+}
+
+.recipe-tips {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.recipe-tips strong {
+  color: var(--accent);
+}
+
+.recipe-no-detail {
+  text-align: center;
+  color: var(--text-dim);
+  padding: 2rem;
+  font-style: italic;
+}
+
+.recipe-link {
+  background: none;
+  border: none;
+  color: var(--primary-light);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  margin-top: 0.5rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s;
+}
+
+.recipe-link:hover {
+  color: var(--accent);
 }
 
 /* --- Print --- */

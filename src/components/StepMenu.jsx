@@ -2,6 +2,8 @@ import { usePlanner } from '../context/PlannerContext';
 import { MENU_DATABASE } from '../data/menuItems';
 import { formatCurrency } from '../utils/calculations';
 import { generateRecommendation } from '../utils/recommendations';
+import { RECIPES } from '../data/recipes';
+import RecipeModal from './RecipeModal';
 import { useState } from 'react';
 
 const CATEGORY_LABELS = {
@@ -15,6 +17,7 @@ export default function StepMenu() {
   const { state, dispatch } = usePlanner();
   const [activeCategory, setActiveCategory] = useState('starters');
   const [filterVeg, setFilterVeg] = useState(false);
+  const [recipeItem, setRecipeItem] = useState(null);
 
   const allItems = {};
   const categories = ['starters', 'mains', 'sides', 'desserts'];
@@ -122,6 +125,17 @@ export default function StepMenu() {
                 {formatCurrency(item.costPerServing * state.guestCount)}
               </span>
             </div>
+            {RECIPES[item.name] && (
+              <button
+                className="recipe-link"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setRecipeItem(item);
+                }}
+              >
+                View Recipe
+              </button>
+            )}
             <div className="menu-card-check">{isSelected(item) ? '✓' : '+'}</div>
           </div>
         ))}
@@ -129,6 +143,10 @@ export default function StepMenu() {
           <p className="empty-state">No items available for this category with your filters.</p>
         )}
       </div>
+
+      {recipeItem && (
+        <RecipeModal item={recipeItem} onClose={() => setRecipeItem(null)} />
+      )}
 
       <div className="step-actions">
         <button className="btn btn-secondary" onClick={() => dispatch({ type: 'PREV_STEP' })}>

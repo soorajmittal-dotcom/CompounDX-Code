@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { PlannerProvider, usePlanner } from './context/PlannerContext';
 import { getPlanFromUrl } from './utils/share';
 import LandingPage from './components/LandingPage';
+import ThemeToggle from './components/ThemeToggle';
 import ProgressBar from './components/ProgressBar';
 import StepPartyType from './components/StepPartyType';
 import StepGuestsBudget from './components/StepGuestsBudget';
@@ -48,6 +49,7 @@ function PlannerApp() {
               <span className="logo-icon">🎉</span>
               PartyPlanner
             </h1>
+            <ThemeToggle />
           </div>
         </header>
         <main className="main-content landing-content">
