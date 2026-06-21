@@ -10,7 +10,7 @@ import {
 import { generateTimeline } from '../utils/timeline';
 import { savePlan, loadAllPlans, deletePlan } from '../utils/storage';
 import { getShareUrl } from '../utils/share';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const FOOD_SOURCE_LABELS = {
   self: 'Self Cooking',
@@ -24,8 +24,12 @@ export default function StepSummary() {
   const [showShoppingList, setShowShoppingList] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
   const [partyTime, setPartyTime] = useState('18:00');
-  const [savedPlans, setSavedPlans] = useState(() => loadAllPlans());
+  const [savedPlans, setSavedPlans] = useState([]);
   const [showSaved, setShowSaved] = useState(false);
+
+  useEffect(() => {
+    loadAllPlans().then(setSavedPlans);
+  }, []);
   const [saveConfirm, setSaveConfirm] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
 
@@ -316,9 +320,9 @@ export default function StepSummary() {
           <div className="save-controls">
             <button
               className="btn btn-accent btn-sm"
-              onClick={() => {
-                savePlan(state);
-                setSavedPlans(loadAllPlans());
+              onClick={async () => {
+                await savePlan(state);
+                setSavedPlans(await loadAllPlans());
                 setSaveConfirm(true);
                 setTimeout(() => setSaveConfirm(false), 2000);
               }}
@@ -356,9 +360,9 @@ export default function StepSummary() {
                   </button>
                   <button
                     className="btn btn-sm btn-danger-sm"
-                    onClick={() => {
-                      deletePlan(plan.id);
-                      setSavedPlans(loadAllPlans());
+                    onClick={async () => {
+                      await deletePlan(plan.id);
+                      setSavedPlans(await loadAllPlans());
                     }}
                   >
                     Delete
