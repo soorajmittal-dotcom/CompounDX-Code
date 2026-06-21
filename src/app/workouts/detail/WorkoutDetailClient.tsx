@@ -1,26 +1,27 @@
 'use client';
 
-import { use } from 'react';
-import { useWorkout } from '@/lib/db-hooks';
+import { useState } from 'react';
+import { useWorkout, useSettings } from '@/lib/db-hooks';
 import { Header } from '@/components/layout/Header';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { formatDateLong, totalVolume } from '@/lib/utils';
+import { formatDateLong, totalVolume, todayStr } from '@/lib/utils';
 import { db } from '@/lib/db';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { WorkoutTemplate, TemplateExercise, Workout, WorkoutExercise, ExerciseSet } from '@/types';
-import { useSettings } from '@/lib/db-hooks';
-import { todayStr } from '@/lib/utils';
 import { v4 as uuid } from 'uuid';
 import { Trash2, Clock, Dumbbell, BookmarkPlus, RotateCcw, Share2 } from 'lucide-react';
-import { useState } from 'react';
 
-export default function WorkoutDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export function WorkoutDetailClient() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id') ?? '';
   const workout = useWorkout(id);
   const settings = useSettings();
   const router = useRouter();
+
+  const [saved, setSaved] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   if (!workout) {
     return (
@@ -34,9 +35,6 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
   const duration = workout.endTime && workout.startTime
     ? Math.round((workout.endTime - workout.startTime) / 60000)
     : null;
-
-  const [saved, setSaved] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const shareWorkout = async () => {
     const unit = settings?.weightUnit ?? 'lbs';
@@ -122,7 +120,7 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
       updatedAt: Date.now(),
     };
     await db.workouts.put(newWorkout);
-    router.push(`/workouts/${newWorkout.id}`);
+    router.push(`/workouts/detail?id=${newWorkout.id}`);
   };
 
   return (

@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "CompounDX - Workout Tracker",
   description: "Track workouts, nutrition, and progression with voice input",
-  manifest: "/manifest.json",
+  manifest: "/CompounDX-Code/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

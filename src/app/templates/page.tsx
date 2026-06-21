@@ -49,7 +49,7 @@ export default function TemplatesPage() {
 
     await db.workouts.put(workout);
     await db.templates.update(templateId, { lastUsed: Date.now() });
-    router.push(`/workouts/${workout.id}`);
+    router.push(`/workouts/detail?id=${workout.id}`);
   };
 
   const deleteTemplate = async (id: string) => {

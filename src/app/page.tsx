@@ -112,7 +112,7 @@ export default function HomePage() {
         <div>
           <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-2">Today&apos;s Workout</h2>
           {todayWorkouts.map((w) => (
-            <Link key={w.id} href={`/workouts/${w.id}`}>
+            <Link key={w.id} href={`/workouts/detail?id=${w.id}`}>
               <Card className="hover:border-zinc-700 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="rounded-lg bg-indigo-600/20 p-2">

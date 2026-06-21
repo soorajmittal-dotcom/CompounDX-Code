@@ -20,7 +20,7 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
     : null;
 
   return (
-    <Link href={`/workouts/${workout.id}`}>
+    <Link href={`/workouts/detail?id=${workout.id}`}>
       <Card className="hover:border-zinc-700 transition-colors active:scale-[0.98]">
         <div className="flex items-start justify-between mb-2">
           <div>
