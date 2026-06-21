@@ -91,9 +91,45 @@ def get_sweet_spots():
 def get_promotions():
     import json
     from pathlib import Path
+    from datetime import date
+
     data_dir = Path(__file__).parent.parent / "data" / "knowledge_base"
     with open(data_dir / "promotions.json") as f:
-        return json.load(f)
+        promos = json.load(f)
+
+    today = date.today().isoformat()
+    active_bonuses = [
+        b for b in promos.get("transfer_bonuses", [])
+        if b.get("end_date", "9999-12-31") >= today and b.get("start_date", "0000-01-01") <= today
+    ]
+    upcoming_bonuses = [
+        b for b in promos.get("transfer_bonuses", [])
+        if b.get("start_date", "0000-01-01") > today
+    ]
+
+    strategies = []
+    for bonus in active_bonuses:
+        if bonus.get("bonus_percent", 0) >= 25:
+            strategies.append({
+                "action": f"Transfer {bonus['from']} to {bonus['to']} now",
+                "reason": f"{bonus['bonus_percent']}% bonus active until {bonus['end_date']}",
+                "urgency": "high" if bonus.get("end_date", "") <= today[:8] + "30" else "medium",
+                "tip": bonus.get("value_tip", ""),
+            })
+
+    for offer in promos.get("card_offers", []):
+        strategies.append({
+            "action": f"Use {offer['card']} for {offer['offer']}",
+            "reason": offer.get("value", ""),
+            "urgency": "ongoing",
+            "tip": offer.get("tip", ""),
+        })
+
+    promos["active_transfer_bonuses"] = active_bonuses
+    promos["upcoming_transfer_bonuses"] = upcoming_bonuses
+    promos["strategies"] = strategies
+    promos["last_updated"] = today
+    return promos
 
 
 @router.get("/memberships")

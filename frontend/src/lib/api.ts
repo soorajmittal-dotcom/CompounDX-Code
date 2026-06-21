@@ -58,6 +58,11 @@ export const api = {
     getAirlinePrograms: () => fetchAPI("/api/cards/programs/airlines"),
     getHotelPrograms: () => fetchAPI("/api/cards/programs/hotels"),
     getValuations: () => fetchAPI("/api/cards/valuations"),
+    recommend: (monthlySpend: Record<string, number>, currentCards: number[]) =>
+      fetchAPI("/api/cards/recommend", {
+        method: "POST",
+        body: JSON.stringify({ monthly_spend: monthlySpend, current_cards: currentCards }),
+      }),
   },
   advisor: {
     query: (q: string) =>

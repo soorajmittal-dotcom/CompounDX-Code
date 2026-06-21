@@ -10,6 +10,7 @@ const navItems = [
   { href: "/trips", label: "Trip Planner", icon: "✈️" },
   { href: "/optimizer", label: "Optimizer", icon: "⚡" },
   { href: "/goals", label: "Goal Planner", icon: "🎯" },
+  { href: "/hotels", label: "Hotel Compare", icon: "🏨" },
   { href: "/scanner", label: "Scanner", icon: "🔍" },
   { href: "/cards", label: "Cards & Programs", icon: "🏦" },
   { href: "/profile", label: "Profile & Family", icon: "👤" },
