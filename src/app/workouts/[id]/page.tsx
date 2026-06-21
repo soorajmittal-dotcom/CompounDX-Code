@@ -13,7 +13,7 @@ import { WorkoutTemplate, TemplateExercise, Workout, WorkoutExercise, ExerciseSe
 import { useSettings } from '@/lib/db-hooks';
 import { todayStr } from '@/lib/utils';
 import { v4 as uuid } from 'uuid';
-import { Trash2, Clock, Dumbbell, BookmarkPlus, RotateCcw } from 'lucide-react';
+import { Trash2, Clock, Dumbbell, BookmarkPlus, RotateCcw, Share2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function WorkoutDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -36,6 +36,37 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
     : null;
 
   const [saved, setSaved] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const shareWorkout = async () => {
+    const unit = settings?.weightUnit ?? 'lbs';
+    const vol = workout.exercises.reduce((s, e) => s + totalVolume(e.sets), 0);
+    const lines = [
+      `${workout.name} - ${formatDateLong(workout.date)}`,
+      duration ? `Duration: ${duration} min` : '',
+      vol > 0 ? `Volume: ${vol.toLocaleString()} ${unit}` : '',
+      '',
+      ...workout.exercises.map((e) => {
+        const sets = e.sets.filter((s) => s.completed);
+        const setStr = sets.map((s) => `${s.weight ?? '-'}x${s.reps ?? '-'}`).join(', ');
+        return `${e.exerciseName}: ${setStr || 'no completed sets'}`;
+      }),
+      '',
+      'Logged with CompounDX',
+    ].filter(Boolean);
+
+    const text = lines.join('\n');
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: workout.name, text });
+        return;
+      } catch {}
+    }
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleDelete = async () => {
     await db.workouts.delete(workout.id);
@@ -133,21 +164,27 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
                     <Dumbbell className="h-4 w-4 text-indigo-400" />
                     <span className="font-medium text-sm text-zinc-100">{exercise.exerciseName}</span>
                   </div>
-                  {vol > 0 && <Badge variant="indigo">{vol.toLocaleString()} lbs</Badge>}
+                  {vol > 0 && <Badge variant="indigo">{vol.toLocaleString()} {settings?.weightUnit ?? 'lbs'}</Badge>}
                 </div>
 
+                {exercise.notes && (
+                  <p className="text-xs text-zinc-400 italic mb-2">{exercise.notes}</p>
+                )}
+
                 <div className="space-y-1">
-                  <div className="grid grid-cols-4 text-[10px] text-zinc-500 uppercase tracking-wider px-1">
+                  <div className="grid grid-cols-5 text-[10px] text-zinc-500 uppercase tracking-wider px-1">
                     <span>Set</span>
                     <span>Weight</span>
                     <span>Reps</span>
+                    <span>RPE</span>
                     <span>Status</span>
                   </div>
                   {exercise.sets.map((set) => (
-                    <div key={set.id} className="grid grid-cols-4 text-sm px-1 py-1">
+                    <div key={set.id} className="grid grid-cols-5 text-sm px-1 py-1">
                       <span className="text-zinc-500">{set.setNumber}</span>
                       <span className="text-zinc-100">{set.weight ?? '-'} {set.weightUnit}</span>
                       <span className="text-zinc-100">{set.reps ?? '-'}</span>
+                      <span className="text-zinc-400">{set.rpe ?? '-'}</span>
                       <span>{set.completed ? <Badge variant="success">Done</Badge> : <Badge>Skip</Badge>}</span>
                     </div>
                   ))}
@@ -163,12 +200,15 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <Button variant="secondary" onClick={repeatWorkout} className="w-full">
-            <RotateCcw className="h-4 w-4 mr-2" /> Repeat
+            <RotateCcw className="h-4 w-4 mr-1" /> Repeat
           </Button>
           <Button variant="secondary" onClick={saveAsTemplate} disabled={saved} className="w-full">
-            <BookmarkPlus className="h-4 w-4 mr-2" /> {saved ? 'Saved' : 'Template'}
+            <BookmarkPlus className="h-4 w-4 mr-1" /> {saved ? 'Saved' : 'Template'}
+          </Button>
+          <Button variant="secondary" onClick={shareWorkout} className="w-full">
+            <Share2 className="h-4 w-4 mr-1" /> {copied ? 'Copied!' : 'Share'}
           </Button>
         </div>
 

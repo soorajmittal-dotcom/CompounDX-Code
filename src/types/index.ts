@@ -29,6 +29,7 @@ export interface WorkoutExercise {
   sets: ExerciseSet[];
   notes?: string;
   order: number;
+  supersetGroup?: number;
 }
 
 export interface Workout {

@@ -3,8 +3,9 @@
 import { WorkoutExercise, ExerciseSet } from '@/types';
 import { SetRow } from './SetRow';
 import { Button } from '@/components/ui/Button';
-import { Plus, Trash2, GripVertical, History } from 'lucide-react';
+import { Plus, Trash2, GripVertical, History, StickyNote, Link2 } from 'lucide-react';
 import { v4 as uuid } from 'uuid';
+import { useState } from 'react';
 
 interface PreviousPerformance {
   sets: { weight?: number; reps?: number }[];
@@ -17,9 +18,11 @@ interface ExerciseEntryProps {
   onChange: (exercise: WorkoutExercise) => void;
   onRemove: () => void;
   previous?: PreviousPerformance;
+  isSuperset?: boolean;
 }
 
-export function ExerciseEntry({ exercise, weightUnit, onChange, onRemove, previous }: ExerciseEntryProps) {
+export function ExerciseEntry({ exercise, weightUnit, onChange, onRemove, previous, isSuperset }: ExerciseEntryProps) {
+  const [showNotes, setShowNotes] = useState(!!exercise.notes);
   const addSet = () => {
     const lastSet = exercise.sets[exercise.sets.length - 1];
     const newSet: ExerciseSet = {
@@ -48,18 +51,32 @@ export function ExerciseEntry({ exercise, weightUnit, onChange, onRemove, previo
   };
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 overflow-hidden">
+    <div className={`rounded-xl border bg-zinc-900/30 overflow-hidden ${isSuperset ? 'border-purple-800/50' : 'border-zinc-800'}`}>
+      {isSuperset && (
+        <div className="flex items-center gap-1 px-3 py-1 bg-purple-900/20 border-b border-purple-800/30">
+          <Link2 className="h-3 w-3 text-purple-400" />
+          <span className="text-[10px] text-purple-400 font-medium uppercase tracking-wider">Superset</span>
+        </div>
+      )}
       <div className="flex items-center justify-between px-3 py-2.5 bg-zinc-800/50">
         <div className="flex items-center gap-2">
           <GripVertical className="h-4 w-4 text-zinc-600" />
           <span className="font-medium text-sm text-zinc-100">{exercise.exerciseName}</span>
         </div>
-        <button
-          onClick={onRemove}
-          className="p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-zinc-800"
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setShowNotes(!showNotes)}
+            className={`p-1.5 rounded-lg transition-colors ${showNotes || exercise.notes ? 'text-indigo-400 bg-indigo-900/20' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'}`}
+          >
+            <StickyNote className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={onRemove}
+            className="p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-zinc-800"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {previous && previous.sets.length > 0 && (
@@ -74,6 +91,18 @@ export function ExerciseEntry({ exercise, weightUnit, onChange, onRemove, previo
               </span>
             ))}
           </span>
+        </div>
+      )}
+
+      {showNotes && (
+        <div className="px-3 py-2 border-b border-zinc-800/50">
+          <textarea
+            placeholder="Add notes..."
+            value={exercise.notes ?? ''}
+            onChange={(e) => onChange({ ...exercise, notes: e.target.value })}
+            rows={2}
+            className="w-full bg-zinc-800/50 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 placeholder:text-zinc-600 border-none outline-none focus:ring-1 focus:ring-indigo-500 resize-none"
+          />
         </div>
       )}
 

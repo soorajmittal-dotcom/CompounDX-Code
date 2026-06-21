@@ -14,7 +14,7 @@ import { WorkoutSummarySheet } from './WorkoutSummarySheet';
 import { VoiceButton } from '@/components/voice/VoiceButton';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { Plus, Save, Clock } from 'lucide-react';
+import { Plus, Save, Clock, Link2 } from 'lucide-react';
 
 interface WorkoutFormProps {
   existingWorkout?: Workout;
@@ -113,6 +113,23 @@ export function WorkoutForm({ existingWorkout }: WorkoutFormProps) {
     setExercises(exercises.filter((_, i) => i !== index));
   };
 
+  const toggleSuperset = (index: number) => {
+    const updated = [...exercises];
+    const a = updated[index];
+    const b = updated[index + 1];
+    if (!a || !b) return;
+
+    if (a.supersetGroup && a.supersetGroup === b.supersetGroup) {
+      updated[index] = { ...a, supersetGroup: undefined };
+      updated[index + 1] = { ...b, supersetGroup: undefined };
+    } else {
+      const group = Date.now();
+      updated[index] = { ...a, supersetGroup: group };
+      updated[index + 1] = { ...b, supersetGroup: group };
+    }
+    setExercises(updated);
+  };
+
   const save = async () => {
     if (exercises.length === 0) return;
     setSaving(true);
@@ -156,16 +173,38 @@ export function WorkoutForm({ existingWorkout }: WorkoutFormProps) {
       </div>
 
       <div className="space-y-3">
-        {exercises.map((exercise, i) => (
-          <ExerciseEntry
-            key={exercise.id}
-            exercise={exercise}
-            weightUnit={weightUnit}
-            onChange={(e) => updateExercise(i, e)}
-            onRemove={() => removeExercise(i)}
-            previous={previousPerf.get(exercise.exerciseId)}
-          />
-        ))}
+        {exercises.map((exercise, i) => {
+          const isSuperset = !!exercise.supersetGroup;
+          const nextIsSameGroup = i < exercises.length - 1 &&
+            exercise.supersetGroup && exercise.supersetGroup === exercises[i + 1]?.supersetGroup;
+          return (
+            <div key={exercise.id}>
+              <ExerciseEntry
+                exercise={exercise}
+                weightUnit={weightUnit}
+                onChange={(e) => updateExercise(i, e)}
+                onRemove={() => removeExercise(i)}
+                previous={previousPerf.get(exercise.exerciseId)}
+                isSuperset={isSuperset}
+              />
+              {i < exercises.length - 1 && (
+                <div className="flex justify-center -my-1.5 relative z-10">
+                  <button
+                    onClick={() => toggleSuperset(i)}
+                    className={`p-1 rounded-full border transition-colors ${
+                      nextIsSameGroup
+                        ? 'bg-purple-600 border-purple-500 text-white'
+                        : 'bg-zinc-900 border-zinc-700 text-zinc-500 hover:text-zinc-300 hover:border-zinc-500'
+                    }`}
+                    title={nextIsSameGroup ? 'Unlink superset' : 'Link as superset'}
+                  >
+                    <Link2 className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       <Button variant="secondary" onClick={() => setShowPicker(true)} className="w-full">
