@@ -11,6 +11,7 @@ const navItems = [
   { href: "/optimizer", label: "Optimizer", icon: "⚡" },
   { href: "/goals", label: "Goal Planner", icon: "🎯" },
   { href: "/hotels", label: "Hotel Compare", icon: "🏨" },
+  { href: "/sweet-spots", label: "Sweet Spots", icon: "💎" },
   { href: "/scanner", label: "Scanner", icon: "🔍" },
   { href: "/cards", label: "Cards & Programs", icon: "🏦" },
   { href: "/cards-recommend", label: "Card Recommender", icon: "✨" },
