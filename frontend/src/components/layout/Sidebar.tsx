@@ -13,6 +13,7 @@ const navItems = [
   { href: "/hotels", label: "Hotel Compare", icon: "🏨" },
   { href: "/scanner", label: "Scanner", icon: "🔍" },
   { href: "/cards", label: "Cards & Programs", icon: "🏦" },
+  { href: "/cards-recommend", label: "Card Recommender", icon: "✨" },
   { href: "/profile", label: "Profile & Family", icon: "👤" },
   { href: "/advisor", label: "AI Advisor", icon: "🤖" },
 ];
