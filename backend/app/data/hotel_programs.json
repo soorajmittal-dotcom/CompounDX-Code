@@ -1,0 +1,137 @@
+[
+  {
+    "id": 1,
+    "name": "Marriott Bonvoy",
+    "program_type": "hotel",
+    "currency_name": "Marriott Bonvoy Points",
+    "cpp_value": 0.8,
+    "elite_tiers": ["Member", "Silver", "Gold", "Platinum", "Titanium", "Ambassador"],
+    "categories": {
+      "1": {"points_per_night": 7500, "avg_cash_rate": 4000},
+      "2": {"points_per_night": 12500, "avg_cash_rate": 6000},
+      "3": {"points_per_night": 17500, "avg_cash_rate": 8000},
+      "4": {"points_per_night": 25000, "avg_cash_rate": 12000},
+      "5": {"points_per_night": 35000, "avg_cash_rate": 18000},
+      "6": {"points_per_night": 50000, "avg_cash_rate": 25000},
+      "7": {"points_per_night": 60000, "avg_cash_rate": 35000},
+      "8": {"points_per_night": 85000, "avg_cash_rate": 50000}
+    },
+    "sweet_spots": [
+      "5th night free on award stays",
+      "Category 1-4 properties in India/SEA",
+      "Transfer to 40+ airline partners (3:1 + 5K bonus at 60K)",
+      "Suite Night Awards for Platinum+"
+    ],
+    "benefits_by_tier": {
+      "Gold": ["Room upgrade", "Late checkout 2PM", "Welcome gift (points)", "Enhanced wifi"],
+      "Platinum": ["Suite upgrade (SNA)", "Late checkout 4PM", "Breakfast", "Lounge access", "Choose benefit"],
+      "Titanium": ["All Platinum + 75% bonus points", "United Silver status"]
+    }
+  },
+  {
+    "id": 2,
+    "name": "Hilton Honors",
+    "program_type": "hotel",
+    "currency_name": "Hilton Honors Points",
+    "cpp_value": 0.5,
+    "elite_tiers": ["Member", "Silver", "Gold", "Diamond"],
+    "categories": {
+      "standard": {"points_per_night": 30000, "avg_cash_rate": 8000},
+      "moderate": {"points_per_night": 50000, "avg_cash_rate": 12000},
+      "premium": {"points_per_night": 70000, "avg_cash_rate": 18000},
+      "luxury": {"points_per_night": 95000, "avg_cash_rate": 30000}
+    },
+    "sweet_spots": [
+      "5th night free on reward stays",
+      "Points + Money for partial redemptions",
+      "Conrad/Waldorf properties on points",
+      "Gold status from Amex Platinum card"
+    ],
+    "benefits_by_tier": {
+      "Gold": ["Room upgrade", "Free breakfast", "80% bonus points"],
+      "Diamond": ["Suite upgrade", "Free breakfast", "100% bonus points", "Executive lounge", "48-hour room guarantee"]
+    }
+  },
+  {
+    "id": 3,
+    "name": "World of Hyatt",
+    "program_type": "hotel",
+    "currency_name": "World of Hyatt Points",
+    "cpp_value": 1.7,
+    "elite_tiers": ["Member", "Discoverist", "Explorist", "Globalist"],
+    "categories": {
+      "1": {"points_per_night": 5000, "avg_cash_rate": 5000},
+      "2": {"points_per_night": 8000, "avg_cash_rate": 7000},
+      "3": {"points_per_night": 12000, "avg_cash_rate": 10000},
+      "4": {"points_per_night": 15000, "avg_cash_rate": 14000},
+      "5": {"points_per_night": 20000, "avg_cash_rate": 20000},
+      "6": {"points_per_night": 25000, "avg_cash_rate": 28000},
+      "7": {"points_per_night": 30000, "avg_cash_rate": 38000},
+      "8": {"points_per_night": 40000, "avg_cash_rate": 55000}
+    },
+    "sweet_spots": [
+      "Best cpp value in hotel loyalty",
+      "Category 1-4 properties are incredible value",
+      "Globalist gets suite upgrades + breakfast + club lounge",
+      "Guest of Honor bookings for Globalists"
+    ],
+    "benefits_by_tier": {
+      "Discoverist": ["Room upgrade", "Late checkout 2PM", "Bottled water"],
+      "Explorist": ["Room upgrade (incl. club)", "Late checkout 2PM", "Upgraded wifi"],
+      "Globalist": ["Suite upgrade", "Late checkout 4PM", "Breakfast", "Club lounge", "Free parking", "Waived resort fees"]
+    }
+  },
+  {
+    "id": 4,
+    "name": "IHG One Rewards",
+    "program_type": "hotel",
+    "currency_name": "IHG One Rewards Points",
+    "cpp_value": 0.5,
+    "elite_tiers": ["Club", "Silver", "Gold", "Platinum", "Diamond"],
+    "categories": {
+      "1": {"points_per_night": 10000, "avg_cash_rate": 3500},
+      "2": {"points_per_night": 15000, "avg_cash_rate": 5000},
+      "3": {"points_per_night": 20000, "avg_cash_rate": 7000},
+      "4": {"points_per_night": 30000, "avg_cash_rate": 10000},
+      "5": {"points_per_night": 40000, "avg_cash_rate": 15000},
+      "6": {"points_per_night": 50000, "avg_cash_rate": 20000}
+    },
+    "sweet_spots": [
+      "4th night free reward on award stays",
+      "Points + Cash options",
+      "InterContinental Ambassador free upgrades",
+      "Point Breaks list (discounted stays)"
+    ],
+    "benefits_by_tier": {
+      "Gold": ["Room upgrade", "Late checkout", "Welcome amenity"],
+      "Platinum": ["Suite upgrade", "Guaranteed availability", "Lounge access at IC"],
+      "Diamond": ["All Platinum + 100% bonus", "Premium wifi", "Choice benefit"]
+    }
+  },
+  {
+    "id": 5,
+    "name": "Accor Live Limitless",
+    "program_type": "hotel",
+    "currency_name": "ALL Reward Points",
+    "cpp_value": 0.6,
+    "elite_tiers": ["Classic", "Silver", "Gold", "Platinum", "Diamond"],
+    "categories": {
+      "economy": {"points_per_night": 4000, "avg_cash_rate": 3000},
+      "midscale": {"points_per_night": 8000, "avg_cash_rate": 5000},
+      "premium": {"points_per_night": 16000, "avg_cash_rate": 10000},
+      "luxury": {"points_per_night": 30000, "avg_cash_rate": 20000},
+      "ultra_luxury": {"points_per_night": 50000, "avg_cash_rate": 40000}
+    },
+    "sweet_spots": [
+      "Ibis/Novotel in India for excellent value",
+      "Raffles and Fairmont on points",
+      "Status match opportunities",
+      "Dining rewards at Accor properties"
+    ],
+    "benefits_by_tier": {
+      "Silver": ["Welcome drink", "Late checkout"],
+      "Gold": ["Room upgrade", "Late checkout", "Welcome gift", "Early check-in"],
+      "Platinum": ["Suite upgrade", "Breakfast", "Lounge access", "Guaranteed availability"]
+    }
+  }
+]

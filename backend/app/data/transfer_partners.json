@@ -1,0 +1,38 @@
+[
+  {"from": "HDFC Reward Points", "to": "KrisFlyer", "ratio": 2.0, "ratio_display": "2:1", "transfer_time_days": 2, "min_transfer": 5000, "notes": "Via SmartBuy portal"},
+  {"from": "HDFC Reward Points", "to": "Flying Blue", "ratio": 2.0, "ratio_display": "2:1", "transfer_time_days": 3, "min_transfer": 5000},
+  {"from": "HDFC Reward Points", "to": "Emirates Skywards", "ratio": 2.0, "ratio_display": "2:1", "transfer_time_days": 3, "min_transfer": 5000},
+  {"from": "HDFC Reward Points", "to": "British Airways Avios", "ratio": 2.0, "ratio_display": "2:1", "transfer_time_days": 3, "min_transfer": 5000},
+  {"from": "HDFC Reward Points", "to": "Marriott Bonvoy", "ratio": 1.0, "ratio_display": "1:1", "transfer_time_days": 5, "min_transfer": 5000},
+  {"from": "HDFC Reward Points", "to": "Air India", "ratio": 1.0, "ratio_display": "1:1", "transfer_time_days": 2, "min_transfer": 5000},
+  {"from": "HDFC Reward Points", "to": "Etihad Guest", "ratio": 2.0, "ratio_display": "2:1", "transfer_time_days": 3, "min_transfer": 5000},
+  {"from": "HDFC Reward Points", "to": "Turkish Miles&Smiles", "ratio": 2.0, "ratio_display": "2:1", "transfer_time_days": 5, "min_transfer": 5000},
+
+  {"from": "Amex Membership Rewards", "to": "KrisFlyer", "ratio": 1.8, "ratio_display": "18:10", "transfer_time_days": 3, "min_transfer": 1000},
+  {"from": "Amex Membership Rewards", "to": "British Airways Avios", "ratio": 1.8, "ratio_display": "18:10", "transfer_time_days": 3, "min_transfer": 1000},
+  {"from": "Amex Membership Rewards", "to": "Emirates Skywards", "ratio": 2.0, "ratio_display": "2:1", "transfer_time_days": 3, "min_transfer": 1000},
+  {"from": "Amex Membership Rewards", "to": "Marriott Bonvoy", "ratio": 1.5, "ratio_display": "3:2", "transfer_time_days": 5, "min_transfer": 1000},
+  {"from": "Amex Membership Rewards", "to": "Hilton Honors", "ratio": 0.67, "ratio_display": "1:1.5", "transfer_time_days": 3, "min_transfer": 1000, "notes": "1 MR = 1.5 Hilton points"},
+
+  {"from": "Axis EDGE Miles", "to": "KrisFlyer", "ratio": 1.0, "ratio_display": "1:1", "transfer_time_days": 2, "min_transfer": 2000},
+  {"from": "Axis EDGE Miles", "to": "Flying Blue", "ratio": 1.0, "ratio_display": "1:1", "transfer_time_days": 3, "min_transfer": 2000},
+  {"from": "Axis EDGE Miles", "to": "Emirates Skywards", "ratio": 1.0, "ratio_display": "1:1", "transfer_time_days": 3, "min_transfer": 2000},
+  {"from": "Axis EDGE Miles", "to": "Turkish Miles&Smiles", "ratio": 1.0, "ratio_display": "1:1", "transfer_time_days": 3, "min_transfer": 2000},
+  {"from": "Axis EDGE Miles", "to": "Etihad Guest", "ratio": 1.0, "ratio_display": "1:1", "transfer_time_days": 3, "min_transfer": 2000},
+
+  {"from": "ICICI Reward Points", "to": "InterMiles", "ratio": 4.0, "ratio_display": "4:1", "transfer_time_days": 2, "min_transfer": 2000},
+  {"from": "InterMiles", "to": "Etihad Guest", "ratio": 1.0, "ratio_display": "1:1", "transfer_time_days": 5, "min_transfer": 5000},
+
+  {"from": "Marriott Bonvoy", "to": "KrisFlyer", "ratio": 3.0, "ratio_display": "3:1", "transfer_time_days": 5, "min_transfer": 3000, "notes": "Transfer 60K, get 5K bonus miles (25K total)"},
+  {"from": "Marriott Bonvoy", "to": "British Airways Avios", "ratio": 3.0, "ratio_display": "3:1", "transfer_time_days": 5, "min_transfer": 3000, "notes": "Transfer 60K, get 5K bonus"},
+  {"from": "Marriott Bonvoy", "to": "Emirates Skywards", "ratio": 3.0, "ratio_display": "3:1", "transfer_time_days": 5, "min_transfer": 3000, "notes": "Transfer 60K, get 5K bonus"},
+  {"from": "Marriott Bonvoy", "to": "Flying Blue", "ratio": 3.0, "ratio_display": "3:1", "transfer_time_days": 5, "min_transfer": 3000, "notes": "Transfer 60K, get 5K bonus"},
+  {"from": "Marriott Bonvoy", "to": "United MileagePlus", "ratio": 3.0, "ratio_display": "3:1", "transfer_time_days": 5, "min_transfer": 3000, "notes": "Transfer 60K, get 5K bonus"},
+  {"from": "Marriott Bonvoy", "to": "Turkish Miles&Smiles", "ratio": 3.0, "ratio_display": "3:1", "transfer_time_days": 5, "min_transfer": 3000},
+  {"from": "Marriott Bonvoy", "to": "Air India", "ratio": 3.0, "ratio_display": "3:1", "transfer_time_days": 5, "min_transfer": 3000},
+
+  {"from": "IndusInd Reward Points", "to": "British Airways Avios", "ratio": 4.0, "ratio_display": "4:1", "transfer_time_days": 5, "min_transfer": 5000},
+  {"from": "IndusInd Reward Points", "to": "Turkish Miles&Smiles", "ratio": 4.0, "ratio_display": "4:1", "transfer_time_days": 5, "min_transfer": 5000},
+
+  {"from": "SBI Reward Points", "to": "Air India", "ratio": 2.0, "ratio_display": "2:1", "transfer_time_days": 5, "min_transfer": 2000}
+]

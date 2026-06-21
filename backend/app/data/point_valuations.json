@@ -1,0 +1,122 @@
+{
+  "HDFC Reward Points": {
+    "cpp_inr": 0.40,
+    "best_use": "Transfer to airline partners (effective 0.75 INR/mile after 2:1 conversion)",
+    "worst_use": "Catalogue redemption (0.20 INR/point)",
+    "transfer_value": 0.75
+  },
+  "Amex Membership Rewards": {
+    "cpp_inr": 0.50,
+    "best_use": "Transfer to KrisFlyer/Avios (effective 0.83 INR/mile after 18:10 conversion)",
+    "worst_use": "Statement credit (0.25 INR/point)",
+    "transfer_value": 0.83
+  },
+  "Axis EDGE Miles": {
+    "cpp_inr": 1.00,
+    "best_use": "Direct airline redemptions or 1:1 transfer to KrisFlyer",
+    "worst_use": "Catalogue redemption (0.50 INR/point)",
+    "transfer_value": 1.50
+  },
+  "ICICI Reward Points": {
+    "cpp_inr": 0.25,
+    "best_use": "Transfer to InterMiles then Etihad (multi-hop)",
+    "worst_use": "Amazon voucher redemption (0.15 INR/point)",
+    "transfer_value": 0.30
+  },
+  "SBI Reward Points": {
+    "cpp_inr": 0.25,
+    "best_use": "Transfer to Air India (2:1)",
+    "worst_use": "Catalogue (0.10 INR/point)",
+    "transfer_value": 0.40
+  },
+  "IndusInd Reward Points": {
+    "cpp_inr": 0.30,
+    "best_use": "Transfer to Avios or Turkish (4:1)",
+    "worst_use": "Catalogue (0.15 INR/point)",
+    "transfer_value": 0.35
+  },
+  "KrisFlyer": {
+    "cpp_inr": 1.50,
+    "best_use": "Business/First class redemptions India-SEA",
+    "worst_use": "Economy redemptions on expensive routes",
+    "transfer_value": 1.50
+  },
+  "British Airways Avios": {
+    "cpp_inr": 1.20,
+    "best_use": "Short-haul flights (Zone 1-4)",
+    "worst_use": "Long-haul economy with high surcharges",
+    "transfer_value": 1.20
+  },
+  "Flying Blue": {
+    "cpp_inr": 1.30,
+    "best_use": "Promo rewards monthly discounts",
+    "worst_use": "Full-price long-haul economy",
+    "transfer_value": 1.30
+  },
+  "Emirates Skywards": {
+    "cpp_inr": 1.20,
+    "best_use": "First class redemptions on A380",
+    "worst_use": "Short-haul economy",
+    "transfer_value": 1.20
+  },
+  "Air India": {
+    "cpp_inr": 0.80,
+    "best_use": "Domestic flights and Star Alliance partners",
+    "worst_use": "Catalogue redemptions",
+    "transfer_value": 0.80
+  },
+  "Marriott Bonvoy": {
+    "cpp_inr": 0.80,
+    "best_use": "Category 1-5 stays with 5th night free",
+    "worst_use": "High-category properties or airline transfers",
+    "transfer_value": 0.80
+  },
+  "Hilton Honors": {
+    "cpp_inr": 0.50,
+    "best_use": "5th night free at premium properties",
+    "worst_use": "Low-category stays",
+    "transfer_value": 0.50
+  },
+  "World of Hyatt": {
+    "cpp_inr": 1.70,
+    "best_use": "Category 6-8 stays (amazing value)",
+    "worst_use": "Transferring to airlines",
+    "transfer_value": 1.70
+  },
+  "IHG One Rewards": {
+    "cpp_inr": 0.50,
+    "best_use": "4th night reward on longer stays",
+    "worst_use": "Short stays at basic properties",
+    "transfer_value": 0.50
+  },
+  "ALL Reward Points": {
+    "cpp_inr": 0.60,
+    "best_use": "Luxury brand stays (Fairmont, Raffles)",
+    "worst_use": "Economy brand stays",
+    "transfer_value": 0.60
+  },
+  "Turkish Miles&Smiles": {
+    "cpp_inr": 1.40,
+    "best_use": "India to Europe Business via Istanbul",
+    "worst_use": "Domestic Turkish flights",
+    "transfer_value": 1.40
+  },
+  "United MileagePlus": {
+    "cpp_inr": 1.30,
+    "best_use": "Saver awards on Star Alliance partners",
+    "worst_use": "Dynamic pricing peaks",
+    "transfer_value": 1.30
+  },
+  "Etihad Guest": {
+    "cpp_inr": 1.10,
+    "best_use": "First/Business class on Etihad A380",
+    "worst_use": "Short-haul economy",
+    "transfer_value": 1.10
+  },
+  "InterMiles": {
+    "cpp_inr": 0.50,
+    "best_use": "Transfer to Etihad or use for flights",
+    "worst_use": "Shopping redemptions",
+    "transfer_value": 0.50
+  }
+}

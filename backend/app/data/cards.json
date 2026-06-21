@@ -1,0 +1,236 @@
+[
+  {
+    "id": 1,
+    "name": "HDFC Infinia",
+    "bank": "HDFC",
+    "network": "Visa Infinite",
+    "annual_fee": 12500,
+    "points_currency": "HDFC Reward Points",
+    "base_earn_rate": 3.33,
+    "bonus_categories": {
+      "smartbuy": 33.0,
+      "travel": 3.33,
+      "dining": 3.33,
+      "international": 3.33,
+      "insurance": 3.33
+    },
+    "benefits": [
+      {"type": "lounge", "description": "Unlimited domestic & international lounge access", "annual_value": 50000},
+      {"type": "golf", "description": "Complimentary golf rounds (6/year)", "annual_value": 30000},
+      {"type": "insurance", "description": "Travel insurance up to ₹2 Cr", "annual_value": 5000},
+      {"type": "milestone", "description": "2 complimentary hotel nights on ₹10L spend", "annual_value": 40000},
+      {"type": "concierge", "description": "24/7 concierge service", "annual_value": 10000},
+      {"type": "forex", "description": "1.99% forex markup (low)", "annual_value": 15000},
+      {"type": "transfer", "description": "1:1 transfer to 15+ airline/hotel partners", "annual_value": 0}
+    ],
+    "transfer_partners": ["KrisFlyer", "Flying Blue", "Emirates Skywards", "British Airways Avios", "Marriott Bonvoy", "Air India"],
+    "image_color": "#1a237e"
+  },
+  {
+    "id": 2,
+    "name": "HDFC Diners Club Black",
+    "bank": "HDFC",
+    "network": "Diners Club",
+    "annual_fee": 10000,
+    "points_currency": "HDFC Reward Points",
+    "base_earn_rate": 3.33,
+    "bonus_categories": {
+      "smartbuy_10x": 33.0,
+      "dining": 3.33,
+      "travel": 3.33,
+      "weekend_dining": 6.66
+    },
+    "benefits": [
+      {"type": "lounge", "description": "Unlimited lounge access (domestic + intl)", "annual_value": 40000},
+      {"type": "golf", "description": "Complimentary golf (6/year)", "annual_value": 30000},
+      {"type": "milestone", "description": "Annual memberships on ₹5L/₹8L spend", "annual_value": 20000},
+      {"type": "dining", "description": "2X rewards on weekend dining", "annual_value": 5000},
+      {"type": "insurance", "description": "Air accident cover ₹2 Cr", "annual_value": 3000}
+    ],
+    "transfer_partners": ["KrisFlyer", "Flying Blue", "Emirates Skywards", "British Airways Avios", "Marriott Bonvoy"],
+    "image_color": "#212121"
+  },
+  {
+    "id": 3,
+    "name": "ICICI Sapphiro",
+    "bank": "ICICI",
+    "network": "Visa Infinite",
+    "annual_fee": 6999,
+    "points_currency": "ICICI Reward Points",
+    "base_earn_rate": 2.0,
+    "bonus_categories": {
+      "travel": 4.0,
+      "dining": 4.0,
+      "departmental_stores": 4.0,
+      "online_spends": 2.0
+    },
+    "benefits": [
+      {"type": "lounge", "description": "Domestic + international lounge access", "annual_value": 25000},
+      {"type": "golf", "description": "Complimentary golf rounds", "annual_value": 15000},
+      {"type": "insurance", "description": "Travel insurance coverage", "annual_value": 3000},
+      {"type": "concierge", "description": "Concierge services", "annual_value": 5000}
+    ],
+    "transfer_partners": ["InterMiles", "Marriott Bonvoy"],
+    "image_color": "#b71c1c"
+  },
+  {
+    "id": 4,
+    "name": "Axis Atlas",
+    "bank": "Axis",
+    "network": "Visa Infinite",
+    "annual_fee": 5000,
+    "points_currency": "Axis EDGE Miles",
+    "base_earn_rate": 5.0,
+    "bonus_categories": {
+      "travel_portals": 15.0,
+      "international": 5.0,
+      "dining": 5.0,
+      "all_spends": 5.0
+    },
+    "benefits": [
+      {"type": "lounge", "description": "8 international + 8 domestic lounge visits/year", "annual_value": 20000},
+      {"type": "forex", "description": "0% forex markup on international spends", "annual_value": 20000},
+      {"type": "milestone", "description": "Bonus EDGE Miles on spend milestones", "annual_value": 10000},
+      {"type": "travel", "description": "Direct airline redemptions at fixed rates", "annual_value": 0}
+    ],
+    "transfer_partners": ["KrisFlyer", "Flying Blue", "Emirates Skywards", "Turkish Miles&Smiles", "Etihad Guest"],
+    "image_color": "#880e4f"
+  },
+  {
+    "id": 5,
+    "name": "Axis Magnus",
+    "bank": "Axis",
+    "network": "Visa Infinite",
+    "annual_fee": 12500,
+    "points_currency": "Axis EDGE Rewards",
+    "base_earn_rate": 12.0,
+    "bonus_categories": {
+      "travel": 35.0,
+      "dining": 12.0,
+      "all_spends": 12.0
+    },
+    "benefits": [
+      {"type": "lounge", "description": "Unlimited international + domestic lounge access", "annual_value": 50000},
+      {"type": "meet_greet", "description": "International airport meet & greet (4/year)", "annual_value": 20000},
+      {"type": "golf", "description": "Complimentary golf (6/year)", "annual_value": 30000},
+      {"type": "insurance", "description": "Comprehensive travel insurance", "annual_value": 5000},
+      {"type": "forex", "description": "Low forex markup", "annual_value": 15000}
+    ],
+    "transfer_partners": ["KrisFlyer", "Flying Blue", "Emirates Skywards"],
+    "image_color": "#4a148c"
+  },
+  {
+    "id": 6,
+    "name": "Amex Platinum Travel",
+    "bank": "American Express",
+    "network": "Amex",
+    "annual_fee": 5000,
+    "points_currency": "Amex Membership Rewards",
+    "base_earn_rate": 5.0,
+    "bonus_categories": {
+      "travel_amex": 15.0,
+      "international": 5.0,
+      "all_spends": 5.0
+    },
+    "benefits": [
+      {"type": "lounge", "description": "International lounge access (Priority Pass)", "annual_value": 20000},
+      {"type": "travel_credit", "description": "₹6,000 annual travel credit on Amex Travel", "annual_value": 6000},
+      {"type": "insurance", "description": "Comprehensive travel insurance", "annual_value": 5000},
+      {"type": "transfer", "description": "18:1 to multiple airline partners", "annual_value": 0}
+    ],
+    "transfer_partners": ["KrisFlyer", "British Airways Avios", "Emirates Skywards", "Marriott Bonvoy", "Hilton Honors"],
+    "image_color": "#006064"
+  },
+  {
+    "id": 7,
+    "name": "Amex MRCC",
+    "bank": "American Express",
+    "network": "Amex",
+    "annual_fee": 3500,
+    "points_currency": "Amex Membership Rewards",
+    "base_earn_rate": 2.0,
+    "bonus_categories": {
+      "groceries": 5.0,
+      "departmental": 5.0,
+      "utilities": 2.0,
+      "all_spends": 2.0
+    },
+    "benefits": [
+      {"type": "milestone", "description": "Bonus MR points at spend milestones", "annual_value": 8000},
+      {"type": "insurance", "description": "Purchase protection", "annual_value": 3000},
+      {"type": "offers", "description": "Amex Offers & merchant cashbacks", "annual_value": 10000}
+    ],
+    "transfer_partners": ["KrisFlyer", "British Airways Avios", "Emirates Skywards", "Marriott Bonvoy", "Hilton Honors"],
+    "image_color": "#1b5e20"
+  },
+  {
+    "id": 8,
+    "name": "SBI Aurum",
+    "bank": "SBI",
+    "network": "Visa Infinite",
+    "annual_fee": 4999,
+    "points_currency": "SBI Reward Points",
+    "base_earn_rate": 4.0,
+    "bonus_categories": {
+      "dining": 20.0,
+      "grocery": 20.0,
+      "departmental": 20.0,
+      "movies": 20.0,
+      "all_spends": 4.0
+    },
+    "benefits": [
+      {"type": "lounge", "description": "Domestic & international lounge access", "annual_value": 15000},
+      {"type": "golf", "description": "Complimentary golf rounds", "annual_value": 10000},
+      {"type": "insurance", "description": "Air accident cover", "annual_value": 2000},
+      {"type": "concierge", "description": "Concierge services", "annual_value": 5000}
+    ],
+    "transfer_partners": ["Air India"],
+    "image_color": "#0d47a1"
+  },
+  {
+    "id": 9,
+    "name": "ICICI Times Black",
+    "bank": "ICICI",
+    "network": "Visa Infinite",
+    "annual_fee": 5000,
+    "points_currency": "ICICI Reward Points",
+    "base_earn_rate": 3.0,
+    "bonus_categories": {
+      "dining": 6.0,
+      "entertainment": 6.0,
+      "grocery": 6.0,
+      "all_spends": 3.0
+    },
+    "benefits": [
+      {"type": "lounge", "description": "4 domestic + 2 intl lounge visits/quarter", "annual_value": 20000},
+      {"type": "dining", "description": "Buy 1 Get 1 on dining (Culinary Treats)", "annual_value": 15000},
+      {"type": "movies", "description": "Buy 1 Get 1 on movies", "annual_value": 5000},
+      {"type": "insurance", "description": "Air accident cover", "annual_value": 2000}
+    ],
+    "transfer_partners": ["InterMiles"],
+    "image_color": "#263238"
+  },
+  {
+    "id": 10,
+    "name": "IndusInd Legend",
+    "bank": "IndusInd",
+    "network": "Visa Infinite",
+    "annual_fee": 9999,
+    "points_currency": "IndusInd Reward Points",
+    "base_earn_rate": 3.5,
+    "bonus_categories": {
+      "weekend_spends": 7.0,
+      "international": 7.0,
+      "travel": 3.5,
+      "all_spends": 3.5
+    },
+    "benefits": [
+      {"type": "lounge", "description": "Unlimited domestic + international lounge access", "annual_value": 35000},
+      {"type": "golf", "description": "Complimentary golf and spa", "annual_value": 20000},
+      {"type": "concierge", "description": "Luxury concierge", "annual_value": 10000},
+      {"type": "insurance", "description": "Travel insurance", "annual_value": 5000}
+    ],
+    "transfer_partners": ["British Airways Avios", "Turkish Miles&Smiles"],
+    "image_color": "#311b92"
+  }
+]

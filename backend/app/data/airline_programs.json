@@ -1,0 +1,164 @@
+[
+  {
+    "id": 1,
+    "name": "KrisFlyer",
+    "program_type": "airline",
+    "airline": "Singapore Airlines",
+    "currency_name": "KrisFlyer Miles",
+    "cpp_value": 1.5,
+    "elite_tiers": ["Member", "Silver", "Gold", "PPS"],
+    "award_chart": {
+      "India-SEA": {"economy": 30000, "premium_economy": 50000, "business": 62000, "first": 92000},
+      "India-East_Asia": {"economy": 45000, "premium_economy": 68000, "business": 88000, "first": 120000},
+      "India-Europe": {"economy": 57000, "premium_economy": 85000, "business": 105000, "first": 148000},
+      "India-North_America": {"economy": 70000, "premium_economy": 105000, "business": 132000, "first": 185000},
+      "India-Australia": {"economy": 50000, "premium_economy": 75000, "business": 92000, "first": 130000},
+      "India-Middle_East": {"economy": 25000, "premium_economy": 40000, "business": 50000, "first": 75000}
+    },
+    "sweet_spots": [
+      "India to SEA Business Class for 62K miles",
+      "Stopover in Singapore on any award",
+      "Partner awards on Star Alliance"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "British Airways Avios",
+    "program_type": "airline",
+    "airline": "British Airways",
+    "currency_name": "Avios",
+    "cpp_value": 1.2,
+    "elite_tiers": ["Blue", "Bronze", "Silver", "Gold"],
+    "award_chart": {
+      "Zone_1": {"economy": 6500, "business": 13000},
+      "Zone_2": {"economy": 9000, "business": 17000},
+      "Zone_4": {"economy": 13000, "business": 25000},
+      "Zone_7": {"economy": 25000, "business": 50000},
+      "Zone_9": {"economy": 50000, "business": 100000},
+      "Zone_10": {"economy": 60000, "business": 120000}
+    },
+    "sweet_spots": [
+      "Short-haul flights at Zone 1-4 pricing",
+      "DEL-BOM on IndiGo/Air India for 9,000 Avios",
+      "India to Middle East for 25,000 Avios"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Flying Blue",
+    "program_type": "airline",
+    "airline": "Air France/KLM",
+    "currency_name": "Flying Blue Miles",
+    "cpp_value": 1.3,
+    "elite_tiers": ["Explorer", "Silver", "Gold", "Platinum", "Ultimate"],
+    "award_chart": {
+      "India-Europe": {"economy": 43000, "premium_economy": 64000, "business": 86000, "first": 143000},
+      "India-SEA": {"economy": 30000, "business": 60000},
+      "India-Africa": {"economy": 35000, "business": 70000},
+      "India-North_America": {"economy": 55000, "business": 107000}
+    },
+    "sweet_spots": [
+      "Promo Rewards with 25-50% discount monthly",
+      "India to Europe in Business for 86K",
+      "SkyTeam partner redemptions"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Emirates Skywards",
+    "program_type": "airline",
+    "airline": "Emirates",
+    "currency_name": "Skywards Miles",
+    "cpp_value": 1.2,
+    "elite_tiers": ["Blue", "Silver", "Gold", "Platinum"],
+    "award_chart": {
+      "India-Dubai": {"economy": 22500, "business": 45000, "first": 67500},
+      "India-Europe_via_DXB": {"economy": 55000, "business": 102500, "first": 150000},
+      "India-North_America_via_DXB": {"economy": 62500, "business": 127500, "first": 187500},
+      "India-Australia_via_DXB": {"economy": 55000, "business": 105000, "first": 150000}
+    },
+    "sweet_spots": [
+      "India to Dubai Economy at 22.5K",
+      "Fifth Freedom routes (e.g., BKK-HKG)",
+      "Upgrade awards for cash ticket holders"
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Air India",
+    "program_type": "airline",
+    "airline": "Air India",
+    "currency_name": "Air India Miles",
+    "cpp_value": 0.8,
+    "elite_tiers": ["Base", "Silver", "Gold", "Platinum"],
+    "award_chart": {
+      "Domestic": {"economy": 15000, "business": 30000},
+      "India-SEA": {"economy": 30000, "business": 60000},
+      "India-Europe": {"economy": 50000, "business": 100000},
+      "India-North_America": {"economy": 75000, "business": 140000},
+      "India-Middle_East": {"economy": 20000, "business": 40000}
+    },
+    "sweet_spots": [
+      "Domestic flights for 15K miles",
+      "Star Alliance partner awards",
+      "Upgrade using miles on paid tickets"
+    ]
+  },
+  {
+    "id": 6,
+    "name": "United MileagePlus",
+    "program_type": "airline",
+    "airline": "United Airlines",
+    "currency_name": "MileagePlus Miles",
+    "cpp_value": 1.3,
+    "elite_tiers": ["Member", "Silver", "Gold", "Platinum", "1K"],
+    "award_chart": {
+      "India-North_America": {"economy": 40000, "business": 80000},
+      "India-Europe": {"economy": 35000, "business": 70000},
+      "India-SEA": {"economy": 25000, "business": 50000}
+    },
+    "sweet_spots": [
+      "Dynamic pricing can offer deals",
+      "ExcursionistPerk for free stopover",
+      "Star Alliance partner awards"
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Turkish Miles&Smiles",
+    "program_type": "airline",
+    "airline": "Turkish Airlines",
+    "currency_name": "Miles",
+    "cpp_value": 1.4,
+    "elite_tiers": ["Classic", "Classic Plus", "Elite", "Elite Plus"],
+    "award_chart": {
+      "India-Istanbul": {"economy": 20000, "business": 40000},
+      "India-Europe_via_IST": {"economy": 30000, "business": 57500},
+      "India-North_America_via_IST": {"economy": 45000, "business": 82500}
+    },
+    "sweet_spots": [
+      "India to Europe via Istanbul in Business for 57.5K",
+      "Star Alliance partner redemptions",
+      "Free stopover in Istanbul"
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Etihad Guest",
+    "program_type": "airline",
+    "airline": "Etihad Airways",
+    "currency_name": "Etihad Guest Miles",
+    "cpp_value": 1.1,
+    "elite_tiers": ["Guest", "Silver", "Gold", "Platinum"],
+    "award_chart": {
+      "India-Abu_Dhabi": {"economy": 20000, "business": 40750, "first": 62500},
+      "India-Europe_via_AUH": {"economy": 42500, "business": 85000, "first": 125000},
+      "India-North_America_via_AUH": {"economy": 50000, "business": 100000, "first": 150000}
+    },
+    "sweet_spots": [
+      "India to Abu Dhabi for 20K miles",
+      "The Residence (above First) on A380",
+      "Partner awards on Etihad Partners"
+    ]
+  }
+]
