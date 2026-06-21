@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { PlannerProvider, usePlanner } from './context/PlannerContext';
+import { getPlanFromUrl } from './utils/share';
 import LandingPage from './components/LandingPage';
 import ProgressBar from './components/ProgressBar';
 import StepPartyType from './components/StepPartyType';
@@ -24,6 +26,18 @@ const STEP_COMPONENTS = [
 
 function PlannerApp() {
   const { state, dispatch } = usePlanner();
+
+  useEffect(() => {
+    const shared = getPlanFromUrl();
+    if (shared) {
+      for (const [key, value] of Object.entries(shared)) {
+        dispatch({ type: 'SET_FIELD', field: key, value });
+      }
+      dispatch({ type: 'SET_FIELD', field: 'started', value: true });
+      dispatch({ type: 'GO_TO_STEP', step: 7 });
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
 
   if (!state.started) {
     return (

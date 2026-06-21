@@ -9,6 +9,7 @@ import {
 } from '../utils/calculations';
 import { generateTimeline } from '../utils/timeline';
 import { savePlan, loadAllPlans, deletePlan } from '../utils/storage';
+import { getShareUrl } from '../utils/share';
 import { useState } from 'react';
 
 const FOOD_SOURCE_LABELS = {
@@ -26,6 +27,7 @@ export default function StepSummary() {
   const [savedPlans, setSavedPlans] = useState(() => loadAllPlans());
   const [showSaved, setShowSaved] = useState(false);
   const [saveConfirm, setSaveConfirm] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   const budget = calculateBudgetBreakdown(state);
   const prepTime = calculatePrepTime(state.selectedMenu, state.selectedDrinks);
@@ -376,7 +378,25 @@ export default function StepSummary() {
           🖨️ Print
         </button>
         <button className="btn btn-outline" onClick={handleExport}>
-          📥 Export
+          📄 Text
+        </button>
+        <button className="btn btn-outline" onClick={async () => {
+          const { exportPDF } = await import('../utils/pdfExport');
+          exportPDF(state);
+        }}>
+          📥 PDF
+        </button>
+        <button
+          className="btn btn-accent"
+          onClick={() => {
+            const url = getShareUrl(state);
+            navigator.clipboard.writeText(url).then(() => {
+              setShareCopied(true);
+              setTimeout(() => setShareCopied(false), 2500);
+            });
+          }}
+        >
+          {shareCopied ? '✓ Link Copied!' : '🔗 Share'}
         </button>
         <button className="btn btn-primary" onClick={() => dispatch({ type: 'RESET' })}>
           Start New Plan
