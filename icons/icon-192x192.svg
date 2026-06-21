@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="40" fill="#0a0a0a"/>
+  <rect x="16" y="16" width="160" height="160" rx="32" fill="#18181b"/>
+  <text x="96" y="115" font-family="system-ui, sans-serif" font-size="64" font-weight="800" fill="#6366f1" text-anchor="middle">DX</text>
+  <rect x="30" y="128" width="132" height="4" rx="2" fill="#6366f1" opacity="0.3"/>
+</svg>
