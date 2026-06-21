@@ -1,4 +1,5 @@
 import { PlannerProvider, usePlanner } from './context/PlannerContext';
+import LandingPage from './components/LandingPage';
 import ProgressBar from './components/ProgressBar';
 import StepPartyType from './components/StepPartyType';
 import StepGuestsBudget from './components/StepGuestsBudget';
@@ -22,14 +23,40 @@ const STEP_COMPONENTS = [
 ];
 
 function PlannerApp() {
-  const { state } = usePlanner();
+  const { state, dispatch } = usePlanner();
+
+  if (!state.started) {
+    return (
+      <div className="app">
+        <header className="app-header app-header-landing">
+          <div className="header-content">
+            <h1 className="logo">
+              <span className="logo-icon">🎉</span>
+              PartyPlanner
+            </h1>
+          </div>
+        </header>
+        <main className="main-content landing-content">
+          <LandingPage />
+        </main>
+        <footer className="app-footer">
+          <p>PartyPlanner — Making every gathering delicious</p>
+        </footer>
+      </div>
+    );
+  }
+
   const StepComponent = STEP_COMPONENTS[state.step];
 
   return (
     <div className="app">
       <header className="app-header">
         <div className="header-content">
-          <h1 className="logo">
+          <h1
+            className="logo logo-clickable"
+            onClick={() => dispatch({ type: 'SET_FIELD', field: 'started', value: false })}
+            title="Back to home"
+          >
             <span className="logo-icon">🎉</span>
             PartyPlanner
           </h1>

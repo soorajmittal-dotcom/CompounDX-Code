@@ -1,5 +1,6 @@
 import { usePlanner } from '../context/PlannerContext';
 import { DIETARY_OPTIONS } from '../data/cuisines';
+import GuestManager from './GuestManager';
 
 export default function StepGuestsBudget() {
   const { state, dispatch } = usePlanner();
@@ -92,7 +93,11 @@ export default function StepGuestsBudget() {
       </div>
 
       <div className="form-section">
-        <label className="form-label">Dietary Requirements</label>
+        <GuestManager />
+      </div>
+
+      <div className="form-section">
+        <label className="form-label">Dietary Requirements (overall)</label>
         <div className="chip-grid">
           {DIETARY_OPTIONS.map((d) => (
             <button

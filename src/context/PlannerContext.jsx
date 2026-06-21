@@ -3,9 +3,11 @@ import { createContext, useContext, useReducer } from 'react';
 const PlannerContext = createContext(null);
 
 const initialState = {
+  started: false,
   step: 0,
   partyType: null,
   guestCount: 10,
+  guestList: [],
   cuisines: [],
   foodSource: null,
   cookingSkill: 'medium',
