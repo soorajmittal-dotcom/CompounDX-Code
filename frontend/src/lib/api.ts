@@ -79,4 +79,19 @@ export const api = {
         body: JSON.stringify({ destination, target_date: targetDate, cabin, travelers }),
       }),
   },
+  user: {
+    getProfile: () => fetchAPI("/api/user/profile"),
+    updateProfile: (profile: any) =>
+      fetchAPI("/api/user/profile", {
+        method: "POST",
+        body: JSON.stringify(profile),
+      }),
+    getFamily: () => fetchAPI("/api/user/family"),
+    addFamilyMember: (member: any) =>
+      fetchAPI("/api/user/family/member", {
+        method: "POST",
+        body: JSON.stringify(member),
+      }),
+    getFamilyValuation: () => fetchAPI("/api/user/family/valuation"),
+  },
 };

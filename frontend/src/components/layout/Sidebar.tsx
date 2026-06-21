@@ -12,6 +12,7 @@ const navItems = [
   { href: "/goals", label: "Goal Planner", icon: "🎯" },
   { href: "/scanner", label: "Scanner", icon: "🔍" },
   { href: "/cards", label: "Cards & Programs", icon: "🏦" },
+  { href: "/profile", label: "Profile & Family", icon: "👤" },
   { href: "/advisor", label: "AI Advisor", icon: "🤖" },
 ];
 

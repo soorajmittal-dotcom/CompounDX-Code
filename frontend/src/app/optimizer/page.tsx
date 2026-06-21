@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api } from "@/lib/api";
 import { formatINR, formatPoints } from "@/lib/utils";
 import type { SpendRecommendation } from "@/lib/types";
+import TransferGraph from "@/components/optimizer/TransferGraph";
 
 const DEFAULT_SPEND = {
   travel: 50000,
@@ -20,7 +21,7 @@ export default function OptimizerPage() {
   const [spend, setSpend] = useState(DEFAULT_SPEND);
   const [results, setResults] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"spend" | "transfer">("spend");
+  const [activeTab, setActiveTab] = useState<"spend" | "transfer" | "graph">("spend");
 
   const [transferSource, setTransferSource] = useState("HDFC Reward Points");
   const [transferTarget, setTransferTarget] = useState("KrisFlyer Miles");
@@ -77,6 +78,16 @@ export default function OptimizerPage() {
           }`}
         >
           Transfer Path Finder
+        </button>
+        <button
+          onClick={() => setActiveTab("graph")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            activeTab === "graph"
+              ? "bg-primary-600 text-white"
+              : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
+          }`}
+        >
+          Transfer Network
         </button>
       </div>
 
@@ -160,6 +171,10 @@ export default function OptimizerPage() {
             </div>
           )}
         </>
+      )}
+
+      {activeTab === "graph" && (
+        <TransferGraph />
       )}
 
       {activeTab === "transfer" && (
