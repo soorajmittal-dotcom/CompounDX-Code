@@ -1,0 +1,103 @@
+{
+  "transfer_bonuses": [
+    {
+      "from": "Marriott Bonvoy",
+      "to": "Multiple Airlines",
+      "bonus_percent": 25,
+      "start_date": "2026-06-15",
+      "end_date": "2026-07-15",
+      "details": "Transfer 60K Marriott points, receive 25K miles + 25% bonus = 31,250 miles",
+      "value_tip": "Makes Marriott-to-airline transfers actually worthwhile"
+    },
+    {
+      "from": "Amex Membership Rewards",
+      "to": "British Airways Avios",
+      "bonus_percent": 40,
+      "start_date": "2026-06-01",
+      "end_date": "2026-06-30",
+      "details": "40% bonus on transfers from Amex MR to Avios",
+      "value_tip": "1000 MR = 1400 Avios instead of 1000. Excellent for short-haul redemptions."
+    },
+    {
+      "from": "HDFC Reward Points",
+      "to": "KrisFlyer",
+      "bonus_percent": 0,
+      "start_date": "2026-01-01",
+      "end_date": "2026-12-31",
+      "details": "Standard transfer always available: 2 RP = 1 KrisFlyer mile via SmartBuy",
+      "value_tip": "No bonus needed — this is already the best use of HDFC points"
+    }
+  ],
+  "card_offers": [
+    {
+      "card": "HDFC Infinia",
+      "offer": "10X rewards on SmartBuy",
+      "end_date": "2026-12-31",
+      "value": "Effectively 33 RP per ₹150 spent = 22% reward rate",
+      "tip": "Use SmartBuy for all flight and hotel bookings"
+    },
+    {
+      "card": "Axis Atlas",
+      "offer": "3X EDGE Miles on travel portal bookings",
+      "end_date": "2026-12-31",
+      "value": "15 EDGE Miles per ₹200 = 7.5% reward rate on travel",
+      "tip": "Book via Axis Travel portal for maximum earning"
+    },
+    {
+      "card": "Amex Platinum Travel",
+      "offer": "5X on Amex Travel Online",
+      "end_date": "2026-12-31",
+      "value": "25 MR per ₹100 spent on travel = 12.5% effective",
+      "tip": "Use Amex travel portal for domestic flights"
+    }
+  ],
+  "hotel_promotions": [
+    {
+      "program": "Marriott Bonvoy",
+      "promotion": "Points Advance",
+      "details": "Book award stays now, earn points later. Reserve before you have the points.",
+      "tip": "Lock in availability at current rates while accumulating points"
+    },
+    {
+      "program": "Hilton Honors",
+      "promotion": "Points Unlimited (Q3 2026)",
+      "details": "Earn double points on stays June-September 2026",
+      "tip": "Register for the promotion before your first stay"
+    },
+    {
+      "program": "World of Hyatt",
+      "promotion": "Bonus Journeys",
+      "details": "Earn 3X points on stays at select Hyatt brands",
+      "tip": "Check eligible properties before booking"
+    }
+  ],
+  "point_purchase_deals": [
+    {
+      "program": "Hilton Honors",
+      "regular_price_per_point": 0.5,
+      "sale_price_per_point": 0.25,
+      "discount_percent": 50,
+      "max_purchase": 160000,
+      "when": "Quarterly sales",
+      "worth_it": "Yes if you have a specific high-value redemption planned (1+ cpp)"
+    },
+    {
+      "program": "Marriott Bonvoy",
+      "regular_price_per_point": 1.25,
+      "sale_price_per_point": 0.88,
+      "discount_percent": 30,
+      "max_purchase": 100000,
+      "when": "Periodic sales",
+      "worth_it": "Rarely — only for Category 1-4 stays with 5th night free"
+    },
+    {
+      "program": "World of Hyatt",
+      "regular_price_per_point": 2.4,
+      "sale_price_per_point": 2.4,
+      "discount_percent": 0,
+      "max_purchase": 55000,
+      "when": "No regular sales",
+      "worth_it": "Almost never at these prices"
+    }
+  ]
+}

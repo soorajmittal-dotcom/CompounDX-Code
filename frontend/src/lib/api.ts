@@ -66,4 +66,17 @@ export const api = {
         body: JSON.stringify({ query: q }),
       }),
   },
+  scanner: {
+    getOpportunities: () => fetchAPI("/api/scanner/opportunities"),
+    getExpiry: () => fetchAPI("/api/scanner/expiry"),
+    getRenewalAll: () => fetchAPI("/api/scanner/renewal/all"),
+    getSweetSpots: () => fetchAPI("/api/scanner/sweet-spots"),
+    getPromotions: () => fetchAPI("/api/scanner/promotions"),
+    getMemberships: () => fetchAPI("/api/scanner/memberships"),
+    createGoal: (destination: string, targetDate: string, cabin: string, travelers: number) =>
+      fetchAPI("/api/scanner/goal", {
+        method: "POST",
+        body: JSON.stringify({ destination, target_date: targetDate, cabin, travelers }),
+      }),
+  },
 };

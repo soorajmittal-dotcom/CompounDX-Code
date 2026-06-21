@@ -9,6 +9,8 @@ const navItems = [
   { href: "/portfolio", label: "Portfolio", icon: "💳" },
   { href: "/trips", label: "Trip Planner", icon: "✈️" },
   { href: "/optimizer", label: "Optimizer", icon: "⚡" },
+  { href: "/goals", label: "Goal Planner", icon: "🎯" },
+  { href: "/scanner", label: "Scanner", icon: "🔍" },
   { href: "/cards", label: "Cards & Programs", icon: "🏦" },
   { href: "/advisor", label: "AI Advisor", icon: "🤖" },
 ];
@@ -56,7 +58,7 @@ export default function Sidebar() {
       {/* Mobile bottom nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 z-50">
         <div className="flex justify-around py-2">
-          {navItems.slice(0, 5).map((item) => (
+          {[navItems[0], navItems[1], navItems[2], navItems[3], navItems[7]].map((item) => (
             <Link
               key={item.href}
               href={item.href}

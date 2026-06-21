@@ -1,0 +1,100 @@
+{
+  "best_cards_by_category": {
+    "travel_bookings": {
+      "winner": "Axis Atlas",
+      "runner_up": "HDFC Infinia (via SmartBuy)",
+      "reason": "15 EDGE Miles per ₹200 on travel portal + 0% forex markup",
+      "effective_reward_rate": "7.5%"
+    },
+    "dining": {
+      "winner": "HDFC Diners Black (weekends)",
+      "runner_up": "ICICI Times Black (Culinary Treats BOGO)",
+      "reason": "2X rewards on weekend dining = 6.66 RP per ₹150",
+      "effective_reward_rate": "4.4%"
+    },
+    "groceries": {
+      "winner": "Amex MRCC",
+      "runner_up": "SBI Aurum",
+      "reason": "5 MR per ₹100 on groceries + departmental stores",
+      "effective_reward_rate": "5%"
+    },
+    "fuel": {
+      "winner": "IndusInd Legend (weekends)",
+      "runner_up": "HDFC Infinia",
+      "reason": "7X rewards on weekends, 1% fuel surcharge waiver on all",
+      "effective_reward_rate": "2.3%"
+    },
+    "international_spends": {
+      "winner": "Axis Atlas",
+      "runner_up": "HDFC Infinia",
+      "reason": "0% forex markup saves 1.5-3.5% immediately",
+      "effective_reward_rate": "7.5% (including forex savings)"
+    },
+    "online_shopping": {
+      "winner": "HDFC Infinia (SmartBuy)",
+      "runner_up": "Amex Platinum Travel (Amex Travel)",
+      "reason": "10X rewards via SmartBuy portal = 33 RP per ₹150",
+      "effective_reward_rate": "22% via portal"
+    },
+    "utilities": {
+      "winner": "Amex MRCC",
+      "runner_up": "Any card with base rewards",
+      "reason": "2 MR per ₹100 on all including utilities",
+      "effective_reward_rate": "2%"
+    },
+    "insurance_premiums": {
+      "winner": "HDFC Infinia",
+      "runner_up": "Axis Magnus",
+      "reason": "Full rewards on insurance (many cards exclude this)",
+      "effective_reward_rate": "3.33%"
+    }
+  },
+  "card_ranking_overall": [
+    {
+      "rank": 1,
+      "card": "HDFC Infinia",
+      "score": 9.5,
+      "strengths": ["Best transfer partners", "SmartBuy 10X", "Unlimited lounges", "Low forex"],
+      "weaknesses": ["₹12,500 fee", "Invite-only"],
+      "ideal_for": "High spenders who travel internationally and want airline miles"
+    },
+    {
+      "rank": 2,
+      "card": "Axis Atlas",
+      "score": 9.0,
+      "strengths": ["0% forex", "5 EDGE Miles/₹200 everywhere", "1:1 airline transfers"],
+      "weaknesses": ["Limited lounge visits", "No hotel transfers"],
+      "ideal_for": "International travelers, frequent flyers, those wanting simple earn rates"
+    },
+    {
+      "rank": 3,
+      "card": "HDFC Diners Club Black",
+      "score": 8.8,
+      "strengths": ["Same partners as Infinia", "10X SmartBuy", "Milestone rewards"],
+      "weaknesses": ["Diners acceptance in India", "₹10K fee"],
+      "ideal_for": "Those who can't get Infinia but want HDFC transfer ecosystem"
+    },
+    {
+      "rank": 4,
+      "card": "Axis Magnus",
+      "score": 8.5,
+      "strengths": ["12 RP/₹200 everywhere", "35X on travel", "Meet & greet"],
+      "weaknesses": ["₹12,500 fee", "Invite-only", "Fewer partners than HDFC"],
+      "ideal_for": "Ultra-high spenders who value high base earn rate"
+    },
+    {
+      "rank": 5,
+      "card": "Amex Platinum Travel",
+      "score": 8.0,
+      "strengths": ["Good partners", "₹6K travel credit", "Priority Pass"],
+      "weaknesses": ["Amex acceptance in India", "18:10 transfer ratio"],
+      "ideal_for": "Those who shop on Amex-friendly platforms and travel frequently"
+    }
+  ],
+  "new_to_premium_path": {
+    "step_1": "Start with HDFC Regalia Gold or Axis Flipkart (₹500 fee, build history)",
+    "step_2": "After 6-12 months, upgrade to HDFC Regalia or Axis Atlas (₹1500-5000 fee)",
+    "step_3": "After 2+ years with good spend, apply for HDFC Infinia or Axis Magnus",
+    "tip": "HDFC values relationship (FD, savings account) over income alone. Open a FD-backed card if needed."
+  }
+}

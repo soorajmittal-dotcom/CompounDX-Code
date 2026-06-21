@@ -1,0 +1,151 @@
+{
+  "flights": [
+    {
+      "route": "India to Southeast Asia",
+      "program": "KrisFlyer",
+      "cabin": "Business",
+      "points": 62000,
+      "typical_cash_inr": 150000,
+      "cpp_inr": 2.34,
+      "notes": "Singapore Airlines direct from DEL/BOM/BLR. Book Saver awards.",
+      "availability_tip": "Best availability 330 days out or within 2 weeks of departure"
+    },
+    {
+      "route": "India to Europe",
+      "program": "Turkish Miles&Smiles",
+      "cabin": "Business",
+      "points": 57500,
+      "typical_cash_inr": 280000,
+      "cpp_inr": 4.74,
+      "notes": "Via Istanbul on Turkish Airlines. Free stopover in IST.",
+      "availability_tip": "Good partner award availability on Star Alliance"
+    },
+    {
+      "route": "India to Europe",
+      "program": "Flying Blue",
+      "cabin": "Business",
+      "points": 86000,
+      "typical_cash_inr": 260000,
+      "cpp_inr": 2.91,
+      "notes": "Direct Air France/KLM. Watch for monthly Promo Rewards at 50% off.",
+      "availability_tip": "Promo Rewards announced first week of each month"
+    },
+    {
+      "route": "India to Middle East",
+      "program": "British Airways Avios",
+      "cabin": "Business",
+      "points": 30000,
+      "typical_cash_inr": 90000,
+      "cpp_inr": 2.87,
+      "notes": "Qatar Airways DOH flights. Low taxes compared to BA metal.",
+      "availability_tip": "Qatar has generous award availability"
+    },
+    {
+      "route": "India domestic",
+      "program": "British Airways Avios",
+      "cabin": "Economy",
+      "points": 9000,
+      "typical_cash_inr": 8000,
+      "cpp_inr": 0.89,
+      "notes": "Book IndiGo/Air India via BA. Only worth it during peak pricing.",
+      "availability_tip": "All seats available on IndiGo as revenue tickets"
+    },
+    {
+      "route": "India to North America",
+      "program": "United MileagePlus",
+      "cabin": "Business",
+      "points": 80000,
+      "typical_cash_inr": 350000,
+      "cpp_inr": 4.27,
+      "notes": "Air India direct DEL-JFK/SFO/ORD on Star Alliance award.",
+      "availability_tip": "Check Air India availability via United.com"
+    },
+    {
+      "route": "India to Japan/Korea",
+      "program": "KrisFlyer",
+      "cabin": "Business",
+      "points": 88000,
+      "typical_cash_inr": 230000,
+      "cpp_inr": 2.55,
+      "notes": "Via Singapore. Can add free stopover in SIN.",
+      "availability_tip": "SQ releases partner space closer to departure"
+    },
+    {
+      "route": "India to Australia",
+      "program": "KrisFlyer",
+      "cabin": "Business",
+      "points": 92000,
+      "typical_cash_inr": 250000,
+      "cpp_inr": 2.66,
+      "notes": "Via Singapore on SQ. Excellent hard product on A350/777.",
+      "availability_tip": "Check SQ and partner (Air India) availability"
+    },
+    {
+      "route": "India to Dubai",
+      "program": "Emirates Skywards",
+      "cabin": "First",
+      "points": 67500,
+      "typical_cash_inr": 200000,
+      "cpp_inr": 2.92,
+      "notes": "Emirates A380 First Class experience. Chauffeur service included.",
+      "availability_tip": "First class opens up closer to departure"
+    },
+    {
+      "route": "India to Maldives",
+      "program": "British Airways Avios",
+      "cabin": "Business",
+      "points": 25000,
+      "typical_cash_inr": 80000,
+      "cpp_inr": 3.00,
+      "notes": "Via Qatar DOH or SriLankan. Short-haul zone pricing.",
+      "availability_tip": "Book well in advance for peak season"
+    }
+  ],
+  "hotels": [
+    {
+      "program": "World of Hyatt",
+      "property_type": "Category 1-3 in India/SEA",
+      "points_per_night": "5000-12000",
+      "typical_cash_inr": "8000-15000",
+      "cpp_inr": 1.5,
+      "notes": "Hyatt Regency and Hyatt Place in India. Best hotel points value.",
+      "tip": "Globalist status gives suite upgrades + breakfast"
+    },
+    {
+      "program": "Marriott Bonvoy",
+      "property_type": "5th Night Free",
+      "points_per_night": "varies",
+      "typical_cash_inr": "varies",
+      "cpp_inr": 1.0,
+      "notes": "Book 5 nights, pay for 4 in points. Effectively 20% discount.",
+      "tip": "Stack with Platinum breakfast benefit for maximum value"
+    },
+    {
+      "program": "Hilton Honors",
+      "property_type": "Conrad/Waldorf on points",
+      "points_per_night": "70000-95000",
+      "typical_cash_inr": "25000-50000",
+      "cpp_inr": 0.45,
+      "notes": "Luxury properties accessible with points. 5th night free stacks.",
+      "tip": "Gold status (free via Amex Platinum) gives breakfast"
+    },
+    {
+      "program": "Marriott Bonvoy",
+      "property_type": "Category 4-5 in SEA",
+      "points_per_night": "25000-35000",
+      "typical_cash_inr": "15000-25000",
+      "cpp_inr": 0.7,
+      "notes": "W, Westin, Sheraton in Bangkok/Bali/Phuket.",
+      "tip": "Transfer from HDFC Infinia 1:1"
+    },
+    {
+      "program": "IHG One Rewards",
+      "property_type": "4th Night Reward",
+      "points_per_night": "varies",
+      "typical_cash_inr": "varies",
+      "cpp_inr": 0.5,
+      "notes": "Book 4 nights, get the 4th free. InterContinental properties.",
+      "tip": "Ambassador status upgrade to suite + breakfast"
+    }
+  ]
+}

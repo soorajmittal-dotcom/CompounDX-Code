@@ -1,0 +1,45 @@
+{
+  "Star Alliance": {
+    "airlines": [
+      "Air India", "Singapore Airlines", "United Airlines", "Lufthansa", "Swiss",
+      "Austrian", "Turkish Airlines", "ANA", "Asiana", "EVA Air", "Air Canada",
+      "Thai Airways", "Ethiopian Airlines", "Air New Zealand", "LOT Polish",
+      "SAS", "TAP Portugal", "Egyptair", "South African Airways"
+    ],
+    "benefits": [
+      "Earn and redeem across all member airlines",
+      "Gold status gives lounge access across alliance",
+      "Priority boarding and baggage for elite members",
+      "Through check-in on connecting flights"
+    ],
+    "indian_relevance": "Air India is the only Indian Star Alliance member. KrisFlyer and United MileagePlus are key programs for India-based travelers."
+  },
+  "Oneworld": {
+    "airlines": [
+      "British Airways", "Qatar Airways", "Cathay Pacific", "Japan Airlines",
+      "American Airlines", "Qantas", "Finnair", "Iberia", "Malaysia Airlines",
+      "Royal Jordanian", "SriLankan Airlines", "Oman Air"
+    ],
+    "benefits": [
+      "Avios is the shared currency (BA, Qatar, Iberia)",
+      "Emerald status gives first class lounge access",
+      "Qatar and Cathay are top choices from India",
+      "Distance-based Avios chart great for short-haul"
+    ],
+    "indian_relevance": "No Indian airline in Oneworld. British Airways Avios and Qatar are primary for India routes."
+  },
+  "SkyTeam": {
+    "airlines": [
+      "Air France", "KLM", "Delta", "Korean Air", "Vietnam Airlines",
+      "China Eastern", "Garuda Indonesia", "Kenya Airways", "Middle East Airlines",
+      "Saudia", "TAROM", "Aerolineas Argentinas", "ITA Airways"
+    ],
+    "benefits": [
+      "Flying Blue covers Air France + KLM",
+      "Monthly Promo Rewards with 25-50% discount",
+      "Good coverage to Europe via CDG/AMS",
+      "SkyPriority across alliance"
+    ],
+    "indian_relevance": "No Indian airline in SkyTeam. Flying Blue is excellent for India-Europe redemptions via Air France/KLM."
+  }
+}
