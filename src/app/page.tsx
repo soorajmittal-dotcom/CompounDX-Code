@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/Card';
 import { NutritionSummary } from '@/components/nutrition/NutritionSummary';
 import { WeeklyCalendar } from '@/components/analytics/WeeklyCalendar';
 import { getCurrentStreak, calculatePRs, getWorkoutFrequency } from '@/lib/analytics';
-import { Dumbbell, Plus, Mic, Flame, Trophy, TrendingUp, Calendar, ClipboardList, Scale } from 'lucide-react';
+import { Dumbbell, Plus, Mic, Flame, Trophy, TrendingUp, Calendar, ClipboardList, Scale, Calculator } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { useMemo } from 'react';
@@ -62,12 +62,12 @@ export default function HomePage() {
             <div className="text-[10px] font-semibold text-zinc-100">Templates</div>
           </Card>
         </Link>
-        <Link href="/bodyweight">
+        <Link href="/tools">
           <Card className="flex flex-col items-center gap-1 py-3 hover:border-indigo-500/50 transition-colors cursor-pointer active:scale-95">
-            <div className="rounded-lg bg-cyan-600/20 p-2">
-              <Scale className="h-4 w-4 text-cyan-400" />
+            <div className="rounded-lg bg-amber-600/20 p-2">
+              <Calculator className="h-4 w-4 text-amber-400" />
             </div>
-            <div className="text-[10px] font-semibold text-zinc-100">Weight</div>
+            <div className="text-[10px] font-semibold text-zinc-100">Tools</div>
           </Card>
         </Link>
       </div>
@@ -157,7 +157,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-medium text-zinc-100">{pr.exerciseName}</div>
-                  <div className="text-xs text-zinc-500">{pr.maxWeight} lbs &middot; {pr.maxReps} reps</div>
+                  <div className="text-xs text-zinc-500">{pr.maxWeight} {settings?.weightUnit ?? 'lbs'} &middot; {pr.maxReps} reps</div>
                 </div>
               </Card>
             ))}

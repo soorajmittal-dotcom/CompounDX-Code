@@ -1,23 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { v4 as uuid } from 'uuid';
 import { Workout, WorkoutExercise, Exercise, ExerciseSet } from '@/types';
 import { db } from '@/lib/db';
 import { useSettings } from '@/lib/db-hooks';
-import { todayStr } from '@/lib/utils';
+import { todayStr, formatDuration, totalVolume } from '@/lib/utils';
 import { ExerciseEntry } from './ExerciseEntry';
 import { ExercisePicker } from './ExercisePicker';
 import { TimerWidget } from './TimerWidget';
+import { WorkoutSummarySheet } from './WorkoutSummarySheet';
 import { VoiceButton } from '@/components/voice/VoiceButton';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { Plus, Save } from 'lucide-react';
+import { Plus, Save, Clock } from 'lucide-react';
 
 interface WorkoutFormProps {
   existingWorkout?: Workout;
 }
+
+type PreviousMap = Map<string, { sets: { weight?: number; reps?: number }[]; date: string }>;
 
 export function WorkoutForm({ existingWorkout }: WorkoutFormProps) {
   const router = useRouter();
@@ -28,8 +31,41 @@ export function WorkoutForm({ existingWorkout }: WorkoutFormProps) {
   const [showPicker, setShowPicker] = useState(false);
   const [saving, setSaving] = useState(false);
   const [startTime] = useState(existingWorkout?.startTime ?? Date.now());
+  const [elapsed, setElapsed] = useState(0);
+  const [previousPerf, setPreviousPerf] = useState<PreviousMap>(new Map());
+  const [savedWorkout, setSavedWorkout] = useState<Workout | null>(null);
 
   const weightUnit = settings?.weightUnit ?? 'lbs';
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+  const fetchPrevious = useCallback(async (exerciseIds: string[]) => {
+    const allWorkouts = await db.workouts.orderBy('date').reverse().toArray();
+    const newMap = new Map(previousPerf);
+
+    for (const exId of exerciseIds) {
+      if (newMap.has(exId)) continue;
+      for (const w of allWorkouts) {
+        const found = w.exercises.find((e) => e.exerciseId === exId);
+        if (found) {
+          newMap.set(exId, {
+            sets: found.sets
+              .filter((s) => s.completed)
+              .map((s) => ({ weight: s.weight, reps: s.reps })),
+            date: w.date,
+          });
+          break;
+        }
+      }
+    }
+
+    setPreviousPerf(newMap);
+  }, [previousPerf]);
 
   const addExercise = (exercise: Exercise) => {
     const newExercise: WorkoutExercise = {
@@ -38,30 +74,13 @@ export function WorkoutForm({ existingWorkout }: WorkoutFormProps) {
       exerciseName: exercise.name,
       order: exercises.length,
       sets: [
-        {
-          id: uuid(),
-          setNumber: 1,
-          weightUnit,
-          type: 'working',
-          completed: false,
-        },
-        {
-          id: uuid(),
-          setNumber: 2,
-          weightUnit,
-          type: 'working',
-          completed: false,
-        },
-        {
-          id: uuid(),
-          setNumber: 3,
-          weightUnit,
-          type: 'working',
-          completed: false,
-        },
+        { id: uuid(), setNumber: 1, weightUnit, type: 'working', completed: false },
+        { id: uuid(), setNumber: 2, weightUnit, type: 'working', completed: false },
+        { id: uuid(), setNumber: 3, weightUnit, type: 'working', completed: false },
       ],
     };
     setExercises([...exercises, newExercise]);
+    fetchPrevious([exercise.id]);
   };
 
   const addVoiceExercises = (parsed: { exerciseName: string; matchedExerciseId?: string; sets: number; reps: number; weight?: number }[]) => {
@@ -81,6 +100,7 @@ export function WorkoutForm({ existingWorkout }: WorkoutFormProps) {
       })),
     }));
     setExercises([...exercises, ...newExercises]);
+    fetchPrevious(parsed.filter((p) => p.matchedExerciseId).map((p) => p.matchedExerciseId!));
   };
 
   const updateExercise = (index: number, exercise: WorkoutExercise) => {
@@ -109,8 +129,12 @@ export function WorkoutForm({ existingWorkout }: WorkoutFormProps) {
     };
 
     await db.workouts.put(workout);
-    router.push('/workouts');
+    setSavedWorkout(workout);
   };
+
+  const completedSets = exercises.reduce((s, e) => s + e.sets.filter((st) => st.completed).length, 0);
+  const totalSets = exercises.reduce((s, e) => s + e.sets.length, 0);
+  const vol = exercises.reduce((s, e) => s + totalVolume(e.sets), 0);
 
   return (
     <div className="space-y-4 pb-24">
@@ -121,6 +145,16 @@ export function WorkoutForm({ existingWorkout }: WorkoutFormProps) {
         className="text-base font-medium"
       />
 
+      {/* Live stats bar */}
+      <div className="flex items-center justify-between text-xs text-zinc-400 bg-zinc-900/50 rounded-xl px-3 py-2 border border-zinc-800">
+        <span className="flex items-center gap-1">
+          <Clock className="h-3.5 w-3.5" />
+          {formatDuration(elapsed)}
+        </span>
+        <span>{completedSets}/{totalSets} sets</span>
+        {vol > 0 && <span>{vol.toLocaleString()} {weightUnit}</span>}
+      </div>
+
       <div className="space-y-3">
         {exercises.map((exercise, i) => (
           <ExerciseEntry
@@ -129,6 +163,7 @@ export function WorkoutForm({ existingWorkout }: WorkoutFormProps) {
             weightUnit={weightUnit}
             onChange={(e) => updateExercise(i, e)}
             onRemove={() => removeExercise(i)}
+            previous={previousPerf.get(exercise.exerciseId)}
           />
         ))}
       </div>
@@ -155,6 +190,13 @@ export function WorkoutForm({ existingWorkout }: WorkoutFormProps) {
 
       <VoiceButton onParsed={addVoiceExercises} />
       <TimerWidget />
+
+      {savedWorkout && (
+        <WorkoutSummarySheet
+          workout={savedWorkout}
+          onClose={() => router.push('/workouts')}
+        />
+      )}
     </div>
   );
 }

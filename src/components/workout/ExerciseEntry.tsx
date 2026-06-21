@@ -3,17 +3,23 @@
 import { WorkoutExercise, ExerciseSet } from '@/types';
 import { SetRow } from './SetRow';
 import { Button } from '@/components/ui/Button';
-import { Plus, Trash2, GripVertical } from 'lucide-react';
+import { Plus, Trash2, GripVertical, History } from 'lucide-react';
 import { v4 as uuid } from 'uuid';
+
+interface PreviousPerformance {
+  sets: { weight?: number; reps?: number }[];
+  date: string;
+}
 
 interface ExerciseEntryProps {
   exercise: WorkoutExercise;
   weightUnit: 'kg' | 'lbs';
   onChange: (exercise: WorkoutExercise) => void;
   onRemove: () => void;
+  previous?: PreviousPerformance;
 }
 
-export function ExerciseEntry({ exercise, weightUnit, onChange, onRemove }: ExerciseEntryProps) {
+export function ExerciseEntry({ exercise, weightUnit, onChange, onRemove, previous }: ExerciseEntryProps) {
   const addSet = () => {
     const lastSet = exercise.sets[exercise.sets.length - 1];
     const newSet: ExerciseSet = {
@@ -55,6 +61,21 @@ export function ExerciseEntry({ exercise, weightUnit, onChange, onRemove }: Exer
           <Trash2 className="h-4 w-4" />
         </button>
       </div>
+
+      {previous && previous.sets.length > 0 && (
+        <div className="px-3 py-1.5 bg-zinc-800/20 border-b border-zinc-800/50 flex items-center gap-1.5">
+          <History className="h-3 w-3 text-zinc-600" />
+          <span className="text-[10px] text-zinc-500">Last: </span>
+          <span className="text-[10px] text-zinc-400">
+            {previous.sets.map((s, i) => (
+              <span key={i}>
+                {i > 0 && ' · '}
+                {s.weight ?? '?'}×{s.reps ?? '?'}
+              </span>
+            ))}
+          </span>
+        </div>
+      )}
 
       <div className="px-3 py-2">
         <div className="flex items-center gap-2 text-[10px] text-zinc-500 uppercase tracking-wider mb-1 px-0.5">
