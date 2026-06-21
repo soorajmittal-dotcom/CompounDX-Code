@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Points Optimizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .card h2 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .demo-section h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 30px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f5f5f5;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 1em;
+            transition: opacity 0.3s;
+        }
+
+        .button:hover {
+            opacity: 0.9;
+        }
+
+        .button-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .tab-button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+            margin-top: 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>✨ Travel Points Optimizer</h1>
+            <p>Maximize rewards, points & elite status when planning trips</p>
+        </header>
+
+        <!-- Features Grid -->
+        <div class="cards">
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <h2>Portfolio Dashboard</h2>
+                <p>Track points across 20+ programs with real-time valuations in INR</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">✈️</div>
+                <h2>Trip Planner</h2>
+                <p>Get 3 optimized trip options: Luxury, Balanced, or Minimum Cash</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🤖</div>
+                <h2>AI Advisor</h2>
+                <p>Natural language queries: "Plan trip to Japan" or "Transfer HDFC to KrisFlyer?"</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🔄</div>
+                <h2>Transfer Graph</h2>
+                <p>Interactive visualization of 30+ transfer relationships between programs</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🏨</div>
+                <h2>Hotel Comparisons</h2>
+                <p>Compare points vs cash with 5th-night-free calculations</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">💎</div>
+                <h2>Sweet Spots</h2>
+                <p>High-value transfer bonuses and redemption opportunities</p>
+            </div>
+        </div>
+
+        <!-- Demo Section -->
+        <div class="demo-section">
+            <h2>📈 Your Points Portfolio</h2>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">₹6.87L</div>
+                    <div class="stat-label">Total Points Value</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">7</div>
+                    <div class="stat-label">Active Programs</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">₹2.4L</div>
+                    <div class="stat-label">Annual Benefits</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">485%</div>
+                    <div class="stat-label">Cards ROI</div>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Program</th>
+                        <th>Balance</th>
+                        <th>Value (INR)</th>
+                        <th>Best Use</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>HDFC Reward Points</strong></td>
+                        <td>350,000</td>
+                        <td>₹2,60,000</td>
+                        <td>Transfer to KrisFlyer</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Marriott Bonvoy</strong></td>
+                        <td>120,000</td>
+                        <td>₹96,000</td>
+                        <td>5th night free stays</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Amex MR</strong></td>
+                        <td>120,000</td>
+                        <td>₹1,20,000</td>
+                        <td>Transfer to airlines</td>
+                    </tr>
+                    <tr>
+                        <td><strong>KrisFlyer Miles</strong></td>
+                        <td>45,000</td>
+                        <td>₹67,500</td>
+                        <td>Business class to SEA</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Axis EDGE Miles</strong></td>
+                        <td>80,000</td>
+                        <td>₹1,20,000</td>
+                        <td>1:1 to KrisFlyer</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Interactive Demo -->
+        <div class="demo-section">
+            <h2>🎯 Interactive Tools</h2>
+
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="switchTab('spend')">💳 Spend Optimizer</button>
+                <button class="tab-button" onclick="switchTab('hotels')">🏨 Hotel Compare</button>
+                <button class="tab-button" onclick="switchTab('trip')">✈️ Trip Planner</button>
+            </div>
+
+            <!-- Spend Optimizer -->
+            <div id="spend" class="tab-content active">
+                <h3>Which card should I use for each category?</h3>
+                <div class="grid-2">
+                    <div>
+                        <div class="input-group">
+                            <label>Monthly Travel Spend</label>
+                            <input type="number" value="50000" id="travelSpend">
+                        </div>
+                        <div class="input-group">
+                            <label>Monthly Dining Spend</label>
+                            <input type="number" value="30000" id="diningSpend">
+                        </div>
+                        <div class="input-group">
+                            <label>Monthly Online Spend</label>
+                            <input type="number" value="20000" id="onlineSpend">
+                        </div>
+                    </div>
+                    <div>
+                        <h4>Recommended Cards:</h4>
+                        <table>
+                            <tr>
+                                <td><strong>Travel (₹50K/mo)</strong></td>
+                                <td>Axis Atlas</td>
+                                <td>5X EDGE Miles</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dining (₹30K/mo)</strong></td>
+                                <td>HDFC Infinia</td>
+                                <td>10X via SmartBuy</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Online (₹20K/mo)</strong></td>
+                                <td>HDFC Infinia</td>
+                                <td>10X SmartBuy Portal</td>
+                            </tr>
+                        </table>
+                        <p style="margin-top: 15px; color: #10b981; font-weight: 600;">
+                            💰 Annual Value: ₹3,60,000 (after ₹50K in fees = ₹3,10,000 net)
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hotel Compare -->
+            <div id="hotels" class="tab-content">
+                <h3>Hotel Programs Comparison for Singapore (5 nights)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Program</th>
+                            <th>Points/Night</th>
+                            <th>Total Points</th>
+                            <th>Cash Value</th>
+                            <th>CPP</th>
+                            <th>Bonus</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>World of Hyatt</strong></td>
+                            <td>12,000</td>
+                            <td>60,000</td>
+                            <td>₹1,12,500</td>
+                            <td><span class="badge">1.88</span></td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hilton Honors</strong></td>
+                            <td>10,000</td>
+                            <td>40,000</td>
+                            <td>₹62,500</td>
+                            <td><span class="badge">1.56</span></td>
+                            <td>1 night free ✓</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Marriott Bonvoy</strong></td>
+                            <td>25,000</td>
+                            <td>100,000</td>
+                            <td>₹90,000</td>
+                            <td>0.9</td>
+                            <td>1 night free ✓</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="margin-top: 15px; color: #667eea; font-weight: 600;">
+                    ⭐ Best Value: World of Hyatt at 1.88 cpp
+                </p>
+            </div>
+
+            <!-- Trip Planner -->
+            <div id="trip" class="tab-content">
+                <h3>Trip Optimization: Delhi → Singapore (5 nights, Business Class)</h3>
+                <div class="grid-2">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px;">
+                        <h4>🚀 Maximum Luxury</h4>
+                        <p><strong>Flight:</strong> KrisFlyer Business (75K miles)</p>
+                        <p><strong>Hotel:</strong> Marriott Cat 6 (125K points)</p>
+                        <p style="margin-top: 15px; font-size: 1.2em;"><strong>Total: 200K points</strong></p>
+                        <p style="opacity: 0.9;">Cash value: ₹2,50,000</p>
+                    </div>
+                    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px;">
+                        <h4>⚖️ Balanced Value</h4>
+                        <p><strong>Flight:</strong> KrisFlyer Premium (55K miles)</p>
+                        <p><strong>Hotel:</strong> Hyatt Cat 4 (60K points)</p>
+                        <p style="margin-top: 15px; font-size: 1.2em;"><strong>Total: 115K points</strong></p>
+                        <p style="color: #10b981; font-weight: 600;">Savings: ₹1,35,000</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="demo-section">
+            <h2>🛠 Tech Stack</h2>
+            <div class="grid-2">
+                <div>
+                    <h3>Backend</h3>
+                    <ul style="list-style: none; line-height: 2;">
+                        <li>✓ FastAPI (Python)</li>
+                        <li>✓ NetworkX (Transfer Graph)</li>
+                        <li>✓ SQLite Database</li>
+                        <li>✓ 9 Optimization Engines</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Frontend</h3>
+                    <ul style="list-style: none; line-height: 2;">
+                        <li>✓ Next.js 14</li>
+                        <li>✓ React + TypeScript</li>
+                        <li>✓ Tailwind CSS</li>
+                        <li>✓ 16 Pages + Dark Mode</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="warning-box">
+                <strong>📦 Full Platform Available:</strong> The complete interactive application is built and ready to use. This page is just a preview. Clone the repo and run <code>./dev.sh</code> to access all features.
+            </div>
+        </div>
+
+        <!-- Supported Programs -->
+        <div class="demo-section">
+            <h2>🎯 Supported Programs</h2>
+            <div class="grid-2">
+                <div>
+                    <h3>Credit Cards</h3>
+                    <p>HDFC Infinia • Diners Black • ICICI Sapphiro • Times Black • Axis Atlas • Magnus • Amex Platinum Travel • MRCC • SBI Aurum • IndusInd Legend</p>
+                </div>
+                <div>
+                    <h3>Loyalty Programs</h3>
+                    <p><strong>Airlines:</strong> KrisFlyer • Avios • Flying Blue • Emirates • Air India • United • Turkish • Etihad</p>
+                    <p><strong>Hotels:</strong> Marriott • Hilton • Hyatt • IHG • Accor</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="demo-section" style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <h2>Ready to Maximize Your Points?</h2>
+            <p style="margin: 20px 0; font-size: 1.1em;">The complete platform with AI advisor, interactive tools, and family pooling</p>
+            <button class="button" onclick="copyCommand()">📋 Copy Setup Command</button>
+            <p style="margin-top: 20px; opacity: 0.9; font-size: 0.9em;" id="copyMessage"></p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Travel Points Optimizer v1.0 • Built with FastAPI & Next.js</p>
+        <p style="margin-top: 10px; opacity: 0.8;">Maximize rewards. Plan smarter. Travel further.</p>
+    </footer>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function copyCommand() {
+            const command = `git clone https://github.com/soorajmittal/CompounDX-Code
+cd CompounDX-Code
+git checkout claude/travel-points-optimizer-2hvdek
+./dev.sh`;
+
+            navigator.clipboard.writeText(command).then(() => {
+                const msg = document.getElementById('copyMessage');
+                msg.textContent = '✓ Commands copied! Paste in terminal to start.';
+                setTimeout(() => {
+                    msg.textContent = '';
+                }, 3000);
+            });
+        }
+    </script>
+</body>
+</html>
