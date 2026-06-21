@@ -5,11 +5,14 @@ import { Header } from '@/components/layout/Header';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { CreateExerciseSheet } from '@/components/exercises/CreateExerciseSheet';
 import { useExerciseLibrary } from '@/lib/db-hooks';
+import { db } from '@/lib/db';
 import { MuscleGroup } from '@/types';
 import { muscleGroupLabel } from '@/lib/utils';
-import { Search, Dumbbell } from 'lucide-react';
+import { Search, Dumbbell, Plus, Trash2 } from 'lucide-react';
 
 const muscleGroups: MuscleGroup[] = [
   'chest', 'back', 'shoulders', 'biceps', 'triceps',
@@ -19,12 +22,20 @@ const muscleGroups: MuscleGroup[] = [
 export default function ExercisesPage() {
   const [search, setSearch] = useState('');
   const [selectedGroup, setSelectedGroup] = useState<MuscleGroup | undefined>();
+  const [showCreate, setShowCreate] = useState(false);
 
   const exercises = useExerciseLibrary({ search, muscleGroup: selectedGroup });
 
   return (
     <div>
-      <Header title="Exercises" />
+      <Header
+        title="Exercises"
+        action={
+          <Button size="sm" onClick={() => setShowCreate(true)}>
+            <Plus className="h-4 w-4 mr-1" /> Create
+          </Button>
+        }
+      />
 
       <div className="px-4 py-4 space-y-4">
         <div className="relative">
@@ -63,7 +74,12 @@ export default function ExercisesPage() {
           <EmptyState
             icon={Dumbbell}
             title="No exercises found"
-            description="Try a different search or filter"
+            description="Try a different search or create a custom exercise"
+            action={
+              <Button onClick={() => setShowCreate(true)}>
+                <Plus className="h-4 w-4 mr-1" /> Create Exercise
+              </Button>
+            }
           />
         )}
 
@@ -71,8 +87,11 @@ export default function ExercisesPage() {
           {exercises?.map((exercise) => (
             <Card key={exercise.id}>
               <div className="flex items-start justify-between">
-                <div>
-                  <div className="text-sm font-medium text-zinc-100">{exercise.name}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-zinc-100">{exercise.name}</span>
+                    {exercise.isCustom && <Badge variant="success">Custom</Badge>}
+                  </div>
                   <div className="flex flex-wrap gap-1 mt-1.5">
                     {exercise.muscleGroups.map((mg) => (
                       <Badge key={mg}>{muscleGroupLabel(mg)}</Badge>
@@ -84,12 +103,24 @@ export default function ExercisesPage() {
                     ))}
                   </div>
                 </div>
-                <Badge variant="indigo">{exercise.category}</Badge>
+                <div className="flex items-center gap-1">
+                  <Badge variant="indigo">{exercise.category}</Badge>
+                  {exercise.isCustom && (
+                    <button
+                      onClick={() => db.exercises.delete(exercise.id)}
+                      className="p-1 rounded text-zinc-600 hover:text-red-400"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
               </div>
             </Card>
           ))}
         </div>
       </div>
+
+      <CreateExerciseSheet open={showCreate} onClose={() => setShowCreate(false)} />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie';
-import { Workout, Exercise, NutritionEntry, UserSettings, WorkoutTemplate } from '@/types';
+import { Workout, Exercise, NutritionEntry, UserSettings, WorkoutTemplate, BodyWeightEntry } from '@/types';
 import { defaultExercises } from './exercise-library';
 
 const db = new Dexie('CompounDX') as Dexie & {
@@ -8,6 +8,7 @@ const db = new Dexie('CompounDX') as Dexie & {
   nutrition: EntityTable<NutritionEntry, 'id'>;
   settings: EntityTable<UserSettings, 'id'>;
   templates: EntityTable<WorkoutTemplate, 'id'>;
+  bodyweight: EntityTable<BodyWeightEntry, 'id'>;
 };
 
 db.version(1).stores({
@@ -23,6 +24,15 @@ db.version(2).stores({
   nutrition: 'id, date, mealType, createdAt',
   settings: 'id',
   templates: 'id, name, createdAt',
+});
+
+db.version(3).stores({
+  workouts: 'id, date, name, createdAt',
+  exercises: 'id, name, category, *muscleGroups',
+  nutrition: 'id, date, mealType, createdAt',
+  settings: 'id',
+  templates: 'id, name, createdAt',
+  bodyweight: 'id, date, createdAt',
 });
 
 db.on('populate', (tx) => {

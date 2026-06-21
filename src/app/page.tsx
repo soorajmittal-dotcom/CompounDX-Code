@@ -1,13 +1,15 @@
 'use client';
 
-import { useWorkoutsByDate, useNutritionLog, useSettings, useAllWorkouts } from '@/lib/db-hooks';
+import { useWorkoutsByDate, useNutritionLog, useSettings, useAllWorkouts, useBodyWeight } from '@/lib/db-hooks';
 import { todayStr } from '@/lib/utils';
 import { Card } from '@/components/ui/Card';
 import { NutritionSummary } from '@/components/nutrition/NutritionSummary';
+import { WeeklyCalendar } from '@/components/analytics/WeeklyCalendar';
 import { getCurrentStreak, calculatePRs, getWorkoutFrequency } from '@/lib/analytics';
-import { Dumbbell, Plus, Mic, Flame, Trophy, TrendingUp, Calendar, ClipboardList } from 'lucide-react';
+import { Dumbbell, Plus, Mic, Flame, Trophy, TrendingUp, Calendar, ClipboardList, Scale } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import { useMemo } from 'react';
 
 export default function HomePage() {
   const today = todayStr();
@@ -15,10 +17,18 @@ export default function HomePage() {
   const todayNutrition = useNutritionLog(today);
   const allWorkouts = useAllWorkouts();
   const settings = useSettings();
+  const bodyWeight = useBodyWeight(1);
 
   const streak = allWorkouts ? getCurrentStreak(allWorkouts) : 0;
   const prs = allWorkouts ? calculatePRs(allWorkouts).slice(0, 3) : [];
   const frequency = allWorkouts ? getWorkoutFrequency(allWorkouts) : 0;
+
+  const workoutDates = useMemo(() => {
+    if (!allWorkouts) return new Set<string>();
+    return new Set(allWorkouts.map((w) => w.date));
+  }, [allWorkouts]);
+
+  const latestWeight = bodyWeight?.[0];
 
   return (
     <div className="px-4 py-6 space-y-5">
@@ -27,29 +37,37 @@ export default function HomePage() {
         <p className="text-sm text-zinc-500">{format(new Date(), 'EEEE, MMMM d')}</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-4 gap-2">
         <Link href="/workouts/new">
-          <Card className="flex flex-col items-center gap-1.5 py-3 hover:border-indigo-500/50 transition-colors cursor-pointer active:scale-95">
-            <div className="rounded-xl bg-indigo-600/20 p-2.5">
-              <Plus className="h-5 w-5 text-indigo-400" />
+          <Card className="flex flex-col items-center gap-1 py-3 hover:border-indigo-500/50 transition-colors cursor-pointer active:scale-95">
+            <div className="rounded-lg bg-indigo-600/20 p-2">
+              <Plus className="h-4 w-4 text-indigo-400" />
             </div>
-            <div className="text-xs font-semibold text-zinc-100">Workout</div>
+            <div className="text-[10px] font-semibold text-zinc-100">Workout</div>
           </Card>
         </Link>
         <Link href="/workouts/new">
-          <Card className="flex flex-col items-center gap-1.5 py-3 hover:border-indigo-500/50 transition-colors cursor-pointer active:scale-95">
-            <div className="rounded-xl bg-purple-600/20 p-2.5">
-              <Mic className="h-5 w-5 text-purple-400" />
+          <Card className="flex flex-col items-center gap-1 py-3 hover:border-indigo-500/50 transition-colors cursor-pointer active:scale-95">
+            <div className="rounded-lg bg-purple-600/20 p-2">
+              <Mic className="h-4 w-4 text-purple-400" />
             </div>
-            <div className="text-xs font-semibold text-zinc-100">Voice Log</div>
+            <div className="text-[10px] font-semibold text-zinc-100">Voice</div>
           </Card>
         </Link>
         <Link href="/templates">
-          <Card className="flex flex-col items-center gap-1.5 py-3 hover:border-indigo-500/50 transition-colors cursor-pointer active:scale-95">
-            <div className="rounded-xl bg-emerald-600/20 p-2.5">
-              <ClipboardList className="h-5 w-5 text-emerald-400" />
+          <Card className="flex flex-col items-center gap-1 py-3 hover:border-indigo-500/50 transition-colors cursor-pointer active:scale-95">
+            <div className="rounded-lg bg-emerald-600/20 p-2">
+              <ClipboardList className="h-4 w-4 text-emerald-400" />
             </div>
-            <div className="text-xs font-semibold text-zinc-100">Templates</div>
+            <div className="text-[10px] font-semibold text-zinc-100">Templates</div>
+          </Card>
+        </Link>
+        <Link href="/bodyweight">
+          <Card className="flex flex-col items-center gap-1 py-3 hover:border-indigo-500/50 transition-colors cursor-pointer active:scale-95">
+            <div className="rounded-lg bg-cyan-600/20 p-2">
+              <Scale className="h-4 w-4 text-cyan-400" />
+            </div>
+            <div className="text-[10px] font-semibold text-zinc-100">Weight</div>
           </Card>
         </Link>
       </div>
@@ -66,9 +84,27 @@ export default function HomePage() {
           <div className="text-[10px] text-zinc-500">This Month</div>
         </Card>
         <Card className="text-center py-3">
-          <TrendingUp className="h-5 w-5 text-emerald-400 mx-auto mb-1" />
-          <div className="text-xl font-bold text-zinc-100">{allWorkouts?.length ?? 0}</div>
-          <div className="text-[10px] text-zinc-500">Total</div>
+          {latestWeight ? (
+            <>
+              <Scale className="h-5 w-5 text-cyan-400 mx-auto mb-1" />
+              <div className="text-xl font-bold text-zinc-100">{latestWeight.weight}</div>
+              <div className="text-[10px] text-zinc-500">{latestWeight.weightUnit}</div>
+            </>
+          ) : (
+            <>
+              <TrendingUp className="h-5 w-5 text-emerald-400 mx-auto mb-1" />
+              <div className="text-xl font-bold text-zinc-100">{allWorkouts?.length ?? 0}</div>
+              <div className="text-[10px] text-zinc-500">Total</div>
+            </>
+          )}
+        </Card>
+      </div>
+
+      {/* Training Calendar */}
+      <div>
+        <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-2">Training Activity</h2>
+        <Card className="overflow-x-auto">
+          <WeeklyCalendar workoutDates={workoutDates} weeks={8} />
         </Card>
       </div>
 

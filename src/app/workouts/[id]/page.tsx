@@ -9,14 +9,17 @@ import { Button } from '@/components/ui/Button';
 import { formatDateLong, totalVolume } from '@/lib/utils';
 import { db } from '@/lib/db';
 import { useRouter } from 'next/navigation';
-import { WorkoutTemplate, TemplateExercise } from '@/types';
+import { WorkoutTemplate, TemplateExercise, Workout, WorkoutExercise, ExerciseSet } from '@/types';
+import { useSettings } from '@/lib/db-hooks';
+import { todayStr } from '@/lib/utils';
 import { v4 as uuid } from 'uuid';
-import { Trash2, Clock, Dumbbell, BookmarkPlus } from 'lucide-react';
+import { Trash2, Clock, Dumbbell, BookmarkPlus, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
 
 export default function WorkoutDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const workout = useWorkout(id);
+  const settings = useSettings();
   const router = useRouter();
 
   if (!workout) {
@@ -60,6 +63,35 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
     };
     await db.templates.add(template);
     setSaved(true);
+  };
+
+  const repeatWorkout = async () => {
+    const weightUnit = settings?.weightUnit ?? 'lbs';
+    const newWorkout: Workout = {
+      id: uuid(),
+      date: todayStr(),
+      startTime: Date.now(),
+      name: workout.name,
+      exercises: workout.exercises.map((e): WorkoutExercise => ({
+        id: uuid(),
+        exerciseId: e.exerciseId,
+        exerciseName: e.exerciseName,
+        order: e.order,
+        sets: e.sets.map((s, j): ExerciseSet => ({
+          id: uuid(),
+          setNumber: j + 1,
+          reps: s.reps,
+          weight: s.weight,
+          weightUnit,
+          type: s.type,
+          completed: false,
+        })),
+      })),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    await db.workouts.put(newWorkout);
+    router.push(`/workouts/${newWorkout.id}`);
   };
 
   return (
@@ -131,9 +163,14 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
           </div>
         )}
 
-        <Button variant="secondary" onClick={saveAsTemplate} disabled={saved} className="w-full">
-          <BookmarkPlus className="h-4 w-4 mr-2" /> {saved ? 'Template Saved' : 'Save as Template'}
-        </Button>
+        <div className="grid grid-cols-2 gap-2">
+          <Button variant="secondary" onClick={repeatWorkout} className="w-full">
+            <RotateCcw className="h-4 w-4 mr-2" /> Repeat
+          </Button>
+          <Button variant="secondary" onClick={saveAsTemplate} disabled={saved} className="w-full">
+            <BookmarkPlus className="h-4 w-4 mr-2" /> {saved ? 'Saved' : 'Template'}
+          </Button>
+        </div>
 
         <Button variant="danger" onClick={handleDelete} className="w-full">
           <Trash2 className="h-4 w-4 mr-2" /> Delete Workout

@@ -114,3 +114,11 @@ export interface WorkoutTemplate {
   createdAt: number;
   lastUsed?: number;
 }
+
+export interface BodyWeightEntry {
+  id: string;
+  date: string;
+  weight: number;
+  weightUnit: 'kg' | 'lbs';
+  createdAt: number;
+}

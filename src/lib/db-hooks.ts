@@ -63,3 +63,10 @@ export function useTemplates() {
 export function useTemplate(id: string) {
   return useLiveQuery(() => db.templates.get(id), [id]);
 }
+
+export function useBodyWeight(limit?: number) {
+  return useLiveQuery(
+    () => db.bodyweight.orderBy('date').reverse().limit(limit ?? 90).toArray(),
+    [limit]
+  );
+}
