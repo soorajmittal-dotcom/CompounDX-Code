@@ -5,7 +5,7 @@ import { todayStr } from '@/lib/utils';
 import { Card } from '@/components/ui/Card';
 import { NutritionSummary } from '@/components/nutrition/NutritionSummary';
 import { getCurrentStreak, calculatePRs, getWorkoutFrequency } from '@/lib/analytics';
-import { Dumbbell, Plus, Mic, Flame, Trophy, TrendingUp, Calendar } from 'lucide-react';
+import { Dumbbell, Plus, Mic, Flame, Trophy, TrendingUp, Calendar, ClipboardList } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 
@@ -27,27 +27,29 @@ export default function HomePage() {
         <p className="text-sm text-zinc-500">{format(new Date(), 'EEEE, MMMM d')}</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <Link href="/workouts/new">
-          <Card className="flex items-center gap-3 hover:border-indigo-500/50 transition-colors cursor-pointer active:scale-95">
+          <Card className="flex flex-col items-center gap-1.5 py-3 hover:border-indigo-500/50 transition-colors cursor-pointer active:scale-95">
             <div className="rounded-xl bg-indigo-600/20 p-2.5">
               <Plus className="h-5 w-5 text-indigo-400" />
             </div>
-            <div>
-              <div className="text-sm font-semibold text-zinc-100">Start Workout</div>
-              <div className="text-[10px] text-zinc-500">Log exercises</div>
-            </div>
+            <div className="text-xs font-semibold text-zinc-100">Workout</div>
           </Card>
         </Link>
         <Link href="/workouts/new">
-          <Card className="flex items-center gap-3 hover:border-indigo-500/50 transition-colors cursor-pointer active:scale-95">
+          <Card className="flex flex-col items-center gap-1.5 py-3 hover:border-indigo-500/50 transition-colors cursor-pointer active:scale-95">
             <div className="rounded-xl bg-purple-600/20 p-2.5">
               <Mic className="h-5 w-5 text-purple-400" />
             </div>
-            <div>
-              <div className="text-sm font-semibold text-zinc-100">Voice Log</div>
-              <div className="text-[10px] text-zinc-500">Speak your workout</div>
+            <div className="text-xs font-semibold text-zinc-100">Voice Log</div>
+          </Card>
+        </Link>
+        <Link href="/templates">
+          <Card className="flex flex-col items-center gap-1.5 py-3 hover:border-indigo-500/50 transition-colors cursor-pointer active:scale-95">
+            <div className="rounded-xl bg-emerald-600/20 p-2.5">
+              <ClipboardList className="h-5 w-5 text-emerald-400" />
             </div>
+            <div className="text-xs font-semibold text-zinc-100">Templates</div>
           </Card>
         </Link>
       </div>

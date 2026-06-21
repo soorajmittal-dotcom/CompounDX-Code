@@ -97,3 +97,20 @@ export interface VoiceParsedExercise {
   duration?: number;
   confidence: number;
 }
+
+export interface TemplateExercise {
+  exerciseId: string;
+  exerciseName: string;
+  sets: number;
+  reps?: number;
+  weight?: number;
+  order: number;
+}
+
+export interface WorkoutTemplate {
+  id: string;
+  name: string;
+  exercises: TemplateExercise[];
+  createdAt: number;
+  lastUsed?: number;
+}

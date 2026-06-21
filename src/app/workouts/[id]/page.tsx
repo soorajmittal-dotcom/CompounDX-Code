@@ -9,7 +9,10 @@ import { Button } from '@/components/ui/Button';
 import { formatDateLong, totalVolume } from '@/lib/utils';
 import { db } from '@/lib/db';
 import { useRouter } from 'next/navigation';
-import { Trash2, Clock, Dumbbell } from 'lucide-react';
+import { WorkoutTemplate, TemplateExercise } from '@/types';
+import { v4 as uuid } from 'uuid';
+import { Trash2, Clock, Dumbbell, BookmarkPlus } from 'lucide-react';
+import { useState } from 'react';
 
 export default function WorkoutDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -29,9 +32,34 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
     ? Math.round((workout.endTime - workout.startTime) / 60000)
     : null;
 
+  const [saved, setSaved] = useState(false);
+
   const handleDelete = async () => {
     await db.workouts.delete(workout.id);
     router.push('/workouts');
+  };
+
+  const saveAsTemplate = async () => {
+    const template: WorkoutTemplate = {
+      id: uuid(),
+      name: workout.name,
+      exercises: workout.exercises.map((e): TemplateExercise => {
+        const completedSets = e.sets.filter((s) => s.completed);
+        const topWeight = Math.max(...completedSets.map((s) => s.weight ?? 0), 0);
+        const topReps = Math.max(...completedSets.map((s) => s.reps ?? 0), 0);
+        return {
+          exerciseId: e.exerciseId,
+          exerciseName: e.exerciseName,
+          sets: e.sets.length,
+          reps: topReps || undefined,
+          weight: topWeight || undefined,
+          order: e.order,
+        };
+      }),
+      createdAt: Date.now(),
+    };
+    await db.templates.add(template);
+    setSaved(true);
   };
 
   return (
@@ -96,6 +124,16 @@ export default function WorkoutDetailPage({ params }: { params: Promise<{ id: st
             );
           })}
         </div>
+
+        {saved && (
+          <div className="p-3 rounded-xl bg-emerald-900/20 text-emerald-400 text-sm text-center">
+            Saved as template!
+          </div>
+        )}
+
+        <Button variant="secondary" onClick={saveAsTemplate} disabled={saved} className="w-full">
+          <BookmarkPlus className="h-4 w-4 mr-2" /> {saved ? 'Template Saved' : 'Save as Template'}
+        </Button>
 
         <Button variant="danger" onClick={handleDelete} className="w-full">
           <Trash2 className="h-4 w-4 mr-2" /> Delete Workout

@@ -55,3 +55,11 @@ export function useNutritionLog(date: string) {
 export function useSettings() {
   return useLiveQuery(() => db.settings.get('user-settings'));
 }
+
+export function useTemplates() {
+  return useLiveQuery(() => db.templates.orderBy('createdAt').reverse().toArray());
+}
+
+export function useTemplate(id: string) {
+  return useLiveQuery(() => db.templates.get(id), [id]);
+}

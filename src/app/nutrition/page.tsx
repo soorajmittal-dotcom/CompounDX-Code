@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { v4 as uuid } from 'uuid';
+import { format, addDays, subDays, parseISO } from 'date-fns';
 import { Header } from '@/components/layout/Header';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -12,16 +13,17 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useNutritionLog, useSettings } from '@/lib/db-hooks';
 import { db } from '@/lib/db';
-import { todayStr } from '@/lib/utils';
+import { todayStr, formatDate } from '@/lib/utils';
 import { NutritionEntry } from '@/types';
-import { Apple, Plus, Search } from 'lucide-react';
+import { Apple, Plus, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
 const mealTypes = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
 
 export default function NutritionPage() {
   const today = todayStr();
-  const entries = useNutritionLog(today);
+  const [selectedDate, setSelectedDate] = useState(today);
+  const entries = useNutritionLog(selectedDate);
   const settings = useSettings();
   const [showAdd, setShowAdd] = useState(false);
   const [mealType, setMealType] = useState<typeof mealTypes[number]>('lunch');
@@ -31,12 +33,20 @@ export default function NutritionPage() {
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
 
+  const goBack = () => setSelectedDate(format(subDays(parseISO(selectedDate), 1), 'yyyy-MM-dd'));
+  const goForward = () => {
+    const next = format(addDays(parseISO(selectedDate), 1), 'yyyy-MM-dd');
+    if (next <= today) setSelectedDate(next);
+  };
+  const goToday = () => setSelectedDate(today);
+  const isToday = selectedDate === today;
+
   const handleAdd = async () => {
     if (!foodName || !calories) return;
 
     const entry: NutritionEntry = {
       id: uuid(),
-      date: today,
+      date: selectedDate,
       mealType,
       foodName,
       calories: Number(calories),
@@ -79,6 +89,23 @@ export default function NutritionPage() {
       />
 
       <div className="px-4 py-4 space-y-4">
+        {/* Date navigator */}
+        <div className="flex items-center justify-between">
+          <button onClick={goBack} className="h-9 w-9 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-100">
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button onClick={goToday} className="text-sm font-medium text-zinc-100 hover:text-indigo-400 transition-colors">
+            {formatDate(selectedDate)}
+          </button>
+          <button
+            onClick={goForward}
+            disabled={isToday}
+            className="h-9 w-9 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-zinc-100 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+
         {settings && entries && (
           <Card>
             <NutritionSummary entries={entries} settings={settings} />
@@ -88,7 +115,7 @@ export default function NutritionPage() {
         {entries && entries.length === 0 && (
           <EmptyState
             icon={Apple}
-            title="No food logged today"
+            title={isToday ? 'No food logged today' : 'No food logged'}
             description="Track your meals to monitor your nutrition"
             action={
               <Button onClick={() => setShowAdd(true)}>
