@@ -1181,6 +1181,190 @@ body {
   background: var(--bg-card-hover);
 }
 
+/* --- Auto-Recommend --- */
+
+.recommend-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(124, 58, 237, 0.1));
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: #1a1a2e;
+  font-weight: 700;
+}
+
+.btn-accent:hover:not(:disabled) {
+  background: var(--accent-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.recommend-hint {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* --- Timeline --- */
+
+.timeline-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.time-input-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.time-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 0.3rem 0.5rem;
+  font-size: 0.85rem;
+}
+
+.timeline {
+  margin-top: 1rem;
+  position: relative;
+  padding-left: 1rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 82px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+
+.timeline-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  position: relative;
+}
+
+.timeline-time {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary-light);
+  min-width: 70px;
+  text-align: right;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+  margin-top: 3px;
+  z-index: 1;
+}
+
+.timeline-prep .timeline-dot { background: var(--text-muted); }
+.timeline-cook .timeline-dot { background: var(--accent); }
+.timeline-drink .timeline-dot { background: #3b82f6; }
+.timeline-setup .timeline-dot { background: var(--primary); }
+.timeline-event .timeline-dot { background: var(--success); width: 16px; height: 16px; margin-top: 1px; }
+
+.timeline-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  gap: 0.5rem;
+}
+
+.timeline-task {
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.timeline-event .timeline-task {
+  font-weight: 700;
+  color: var(--success);
+}
+
+.timeline-duration {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  background: var(--bg-input);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* --- Saved Plans --- */
+
+.save-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.saved-plans-list {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.saved-plan-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--bg-input);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.saved-plan-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.saved-plan-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.saved-plan-date {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.saved-plan-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.btn-danger-sm {
+  color: var(--danger) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+.btn-danger-sm:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
 /* --- Responsive --- */
 
 @media (max-width: 640px) {

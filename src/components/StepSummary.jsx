@@ -7,6 +7,8 @@ import {
   formatCurrency,
   formatTime,
 } from '../utils/calculations';
+import { generateTimeline } from '../utils/timeline';
+import { savePlan, loadAllPlans, deletePlan } from '../utils/storage';
 import { useState } from 'react';
 
 const FOOD_SOURCE_LABELS = {
@@ -19,6 +21,11 @@ const FOOD_SOURCE_LABELS = {
 export default function StepSummary() {
   const { state, dispatch } = usePlanner();
   const [showShoppingList, setShowShoppingList] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
+  const [partyTime, setPartyTime] = useState('18:00');
+  const [savedPlans, setSavedPlans] = useState(() => loadAllPlans());
+  const [showSaved, setShowSaved] = useState(false);
+  const [saveConfirm, setSaveConfirm] = useState(false);
 
   const budget = calculateBudgetBreakdown(state);
   const prepTime = calculatePrepTime(state.selectedMenu, state.selectedDrinks);
@@ -257,6 +264,107 @@ export default function StepSummary() {
               ))}
             </tbody>
           </table>
+        )}
+      </div>
+
+      {(state.foodSource === 'self' || state.foodSource === 'mix') && (
+        <div className="summary-card">
+          <div className="shopping-header">
+            <h3>Prep Timeline</h3>
+            <div className="timeline-controls">
+              <label className="time-input-label">
+                Party starts at
+                <input
+                  type="time"
+                  value={partyTime}
+                  onChange={(e) => setPartyTime(e.target.value)}
+                  className="time-input"
+                />
+              </label>
+              <button
+                className="btn btn-sm"
+                onClick={() => setShowTimeline(!showTimeline)}
+              >
+                {showTimeline ? 'Hide' : 'Show'}
+              </button>
+            </div>
+          </div>
+          {showTimeline && (
+            <div className="timeline">
+              {generateTimeline(state.selectedMenu, state.selectedDrinks, partyTime).map((entry, i) => (
+                <div key={i} className={`timeline-entry timeline-${entry.type}`}>
+                  <span className="timeline-time">{entry.time}</span>
+                  <span className="timeline-dot" />
+                  <div className="timeline-info">
+                    <span className="timeline-task">{entry.task}</span>
+                    {entry.duration > 0 && (
+                      <span className="timeline-duration">{entry.duration}m</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="summary-card">
+        <div className="shopping-header">
+          <h3>Saved Plans</h3>
+          <div className="save-controls">
+            <button
+              className="btn btn-accent btn-sm"
+              onClick={() => {
+                savePlan(state);
+                setSavedPlans(loadAllPlans());
+                setSaveConfirm(true);
+                setTimeout(() => setSaveConfirm(false), 2000);
+              }}
+            >
+              {saveConfirm ? '✓ Saved!' : 'Save This Plan'}
+            </button>
+            {savedPlans.length > 0 && (
+              <button className="btn btn-sm" onClick={() => setShowSaved(!showSaved)}>
+                {showSaved ? 'Hide' : `View (${savedPlans.length})`}
+              </button>
+            )}
+          </div>
+        </div>
+        {showSaved && savedPlans.length > 0 && (
+          <div className="saved-plans-list">
+            {savedPlans.map((plan) => (
+              <div key={plan.id} className="saved-plan-item">
+                <div className="saved-plan-info">
+                  <span className="saved-plan-name">{plan.name}</span>
+                  <span className="saved-plan-date">
+                    {new Date(plan.savedAt).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="saved-plan-actions">
+                  <button
+                    className="btn btn-sm"
+                    onClick={() => {
+                      const s = plan.state;
+                      for (const [key, value] of Object.entries(s)) {
+                        dispatch({ type: 'SET_FIELD', field: key, value });
+                      }
+                    }}
+                  >
+                    Load
+                  </button>
+                  <button
+                    className="btn btn-sm btn-danger-sm"
+                    onClick={() => {
+                      deletePlan(plan.id);
+                      setSavedPlans(loadAllPlans());
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 

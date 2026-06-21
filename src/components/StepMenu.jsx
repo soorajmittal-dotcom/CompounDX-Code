@@ -1,6 +1,7 @@
 import { usePlanner } from '../context/PlannerContext';
 import { MENU_DATABASE } from '../data/menuItems';
 import { formatCurrency } from '../utils/calculations';
+import { generateRecommendation } from '../utils/recommendations';
 import { useState } from 'react';
 
 const CATEGORY_LABELS = {
@@ -56,6 +57,22 @@ export default function StepMenu() {
       <p className="step-subtitle">
         Select dishes from your chosen cuisines ({totalSelected} items selected)
       </p>
+
+      <div className="recommend-bar">
+        <button
+          className="btn btn-accent"
+          onClick={() => {
+            const rec = generateRecommendation(state);
+            dispatch({ type: 'SET_FIELD', field: 'selectedMenu', value: rec.selectedMenu });
+            dispatch({ type: 'SET_FIELD', field: 'selectedDrinks', value: rec.selectedDrinks });
+          }}
+        >
+          Auto-Recommend Menu
+        </button>
+        <span className="recommend-hint">
+          Based on your budget, guests, time, and skill level
+        </span>
+      </div>
 
       <div className="menu-tabs">
         {categories.map((cat) => (
