@@ -76,7 +76,13 @@ export function SetRow({ set, onChange, onRemove }: SetRowProps) {
         )}
       </button>
       <button
-        onClick={() => onChange({ ...set, completed: !set.completed })}
+        onClick={() => {
+          const wasCompleted = set.completed;
+          onChange({ ...set, completed: !set.completed });
+          if (!wasCompleted) {
+            window.dispatchEvent(new Event('set-completed'));
+          }
+        }}
         className={cn(
           'h-8 w-8 rounded-lg flex items-center justify-center transition-colors',
           set.completed ? 'bg-emerald-600 text-white' : 'bg-zinc-800 text-zinc-500 hover:text-zinc-300'

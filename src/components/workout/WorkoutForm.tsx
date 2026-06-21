@@ -113,6 +113,13 @@ export function WorkoutForm({ existingWorkout }: WorkoutFormProps) {
     setExercises(exercises.filter((_, i) => i !== index));
   };
 
+  const moveExercise = (from: number, to: number) => {
+    const updated = [...exercises];
+    const [moved] = updated.splice(from, 1);
+    updated.splice(to, 0, moved);
+    setExercises(updated.map((e, i) => ({ ...e, order: i })));
+  };
+
   const toggleSuperset = (index: number) => {
     const updated = [...exercises];
     const a = updated[index];
@@ -184,6 +191,8 @@ export function WorkoutForm({ existingWorkout }: WorkoutFormProps) {
                 weightUnit={weightUnit}
                 onChange={(e) => updateExercise(i, e)}
                 onRemove={() => removeExercise(i)}
+                onMoveUp={i > 0 ? () => moveExercise(i, i - 1) : undefined}
+                onMoveDown={i < exercises.length - 1 ? () => moveExercise(i, i + 1) : undefined}
                 previous={previousPerf.get(exercise.exerciseId)}
                 isSuperset={isSuperset}
               />

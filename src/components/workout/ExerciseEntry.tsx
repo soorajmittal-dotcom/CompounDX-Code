@@ -3,7 +3,7 @@
 import { WorkoutExercise, ExerciseSet } from '@/types';
 import { SetRow } from './SetRow';
 import { Button } from '@/components/ui/Button';
-import { Plus, Trash2, GripVertical, History, StickyNote, Link2 } from 'lucide-react';
+import { Plus, Trash2, GripVertical, History, StickyNote, Link2, ChevronUp, ChevronDown } from 'lucide-react';
 import { v4 as uuid } from 'uuid';
 import { useState } from 'react';
 
@@ -17,11 +17,13 @@ interface ExerciseEntryProps {
   weightUnit: 'kg' | 'lbs';
   onChange: (exercise: WorkoutExercise) => void;
   onRemove: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
   previous?: PreviousPerformance;
   isSuperset?: boolean;
 }
 
-export function ExerciseEntry({ exercise, weightUnit, onChange, onRemove, previous, isSuperset }: ExerciseEntryProps) {
+export function ExerciseEntry({ exercise, weightUnit, onChange, onRemove, onMoveUp, onMoveDown, previous, isSuperset }: ExerciseEntryProps) {
   const [showNotes, setShowNotes] = useState(!!exercise.notes);
   const addSet = () => {
     const lastSet = exercise.sets[exercise.sets.length - 1];
@@ -59,8 +61,20 @@ export function ExerciseEntry({ exercise, weightUnit, onChange, onRemove, previo
         </div>
       )}
       <div className="flex items-center justify-between px-3 py-2.5 bg-zinc-800/50">
-        <div className="flex items-center gap-2">
-          <GripVertical className="h-4 w-4 text-zinc-600" />
+        <div className="flex items-center gap-1.5">
+          <div className="flex flex-col -my-1">
+            {onMoveUp && (
+              <button onClick={onMoveUp} className="p-0.5 text-zinc-600 hover:text-zinc-300">
+                <ChevronUp className="h-3 w-3" />
+              </button>
+            )}
+            {onMoveDown && (
+              <button onClick={onMoveDown} className="p-0.5 text-zinc-600 hover:text-zinc-300">
+                <ChevronDown className="h-3 w-3" />
+              </button>
+            )}
+            {!onMoveUp && !onMoveDown && <GripVertical className="h-4 w-4 text-zinc-600" />}
+          </div>
           <span className="font-medium text-sm text-zinc-100">{exercise.exerciseName}</span>
         </div>
         <div className="flex items-center gap-1">

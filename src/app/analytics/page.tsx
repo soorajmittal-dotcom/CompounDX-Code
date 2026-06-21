@@ -7,7 +7,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ProgressChart } from '@/components/analytics/ProgressChart';
 import { VolumeChart } from '@/components/analytics/VolumeChart';
 import { StatsGrid } from '@/components/analytics/StatsGrid';
-import { useAllWorkouts, useExerciseLibrary } from '@/lib/db-hooks';
+import { useAllWorkouts, useExerciseLibrary, useSettings } from '@/lib/db-hooks';
 import {
   calculatePRs,
   getVolumeOverTime,
@@ -15,15 +15,19 @@ import {
   getCurrentStreak,
   getWorkoutFrequency,
   getExerciseRecommendations,
+  getMuscleGroupVolume,
 } from '@/lib/analytics';
 import { Badge } from '@/components/ui/Badge';
-import { totalVolume } from '@/lib/utils';
+import { totalVolume, muscleGroupLabel } from '@/lib/utils';
+import { MuscleGroup } from '@/types';
 import { BarChart3, Dumbbell, Flame, Lightbulb, Target, TrendingUp, Trophy } from 'lucide-react';
 
 export default function AnalyticsPage() {
   const workouts = useAllWorkouts();
   const exercises = useExerciseLibrary();
+  const settings = useSettings();
   const [selectedExercise, setSelectedExercise] = useState<string>('');
+  const unit = settings?.weightUnit ?? 'lbs';
 
   if (!workouts || !exercises) {
     return (
@@ -86,6 +90,37 @@ export default function AnalyticsPage() {
           </Card>
         </div>
 
+        {(() => {
+          const exerciseMap = new Map<string, MuscleGroup[]>();
+          exercises.forEach((e) => exerciseMap.set(e.id, e.muscleGroups));
+          const mgVolume = getMuscleGroupVolume(workouts, exerciseMap, 30);
+          const entries = Array.from(mgVolume.entries())
+            .sort((a, b) => b[1] - a[1]);
+          const maxVol = Math.max(...entries.map(([, v]) => v), 1);
+          if (entries.length === 0) return null;
+          return (
+            <div>
+              <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Muscle Groups (30d)</h2>
+              <Card className="space-y-2">
+                {entries.map(([group, vol]) => (
+                  <div key={group}>
+                    <div className="flex items-center justify-between text-xs mb-0.5">
+                      <span className="text-zinc-300">{muscleGroupLabel(group)}</span>
+                      <span className="text-zinc-500">{vol.toLocaleString()}</span>
+                    </div>
+                    <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-indigo-500 rounded-full transition-all"
+                        style={{ width: `${(vol / maxVol) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </Card>
+            </div>
+          );
+        })()}
+
         <div>
           <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Weight Progression</h2>
           <select
@@ -141,7 +176,7 @@ export default function AnalyticsPage() {
                   <div className="flex-1">
                     <div className="text-sm font-medium text-zinc-100">{pr.exerciseName}</div>
                     <div className="text-xs text-zinc-500">
-                      {pr.maxWeight} lbs &middot; {pr.maxReps} reps &middot; {pr.maxVolume.toLocaleString()} vol
+                      {pr.maxWeight} {unit} &middot; {pr.maxReps} reps &middot; {pr.maxVolume.toLocaleString()} vol
                     </div>
                   </div>
                 </Card>

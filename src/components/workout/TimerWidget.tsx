@@ -12,7 +12,22 @@ export function TimerWidget() {
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [targetSeconds, setTargetSeconds] = useState(0);
+  const [autoRest, setAutoRest] = useState(90);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    const handler = () => {
+      if (autoRest > 0) {
+        setShow(true);
+        setMode('countdown');
+        setSeconds(autoRest);
+        setTargetSeconds(autoRest);
+        setIsRunning(true);
+      }
+    };
+    window.addEventListener('set-completed', handler);
+    return () => window.removeEventListener('set-completed', handler);
+  }, [autoRest]);
 
   const tick = useCallback(() => {
     setSeconds((prev) => {
@@ -152,6 +167,24 @@ export function TimerWidget() {
             <Timer className="h-3 w-3 mr-1" />SW
           </button>
         )}
+      </div>
+
+      <div className="mt-3 pt-2 border-t border-zinc-800">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] text-zinc-500">Auto-rest on set</span>
+          <select
+            value={autoRest}
+            onChange={(e) => setAutoRest(Number(e.target.value))}
+            className="bg-zinc-800 text-zinc-300 text-[10px] rounded px-1.5 py-0.5 border-none outline-none"
+          >
+            <option value={0}>Off</option>
+            <option value={30}>30s</option>
+            <option value={60}>60s</option>
+            <option value={90}>90s</option>
+            <option value={120}>2m</option>
+            <option value={180}>3m</option>
+          </select>
+        </div>
       </div>
     </div>
   );
