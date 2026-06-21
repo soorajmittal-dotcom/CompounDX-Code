@@ -14,7 +14,8 @@ import { useNutritionLog, useSettings } from '@/lib/db-hooks';
 import { db } from '@/lib/db';
 import { todayStr } from '@/lib/utils';
 import { NutritionEntry } from '@/types';
-import { Apple, Plus } from 'lucide-react';
+import { Apple, Plus, Search } from 'lucide-react';
+import Link from 'next/link';
 
 const mealTypes = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
 
@@ -64,9 +65,16 @@ export default function NutritionPage() {
       <Header
         title="Nutrition"
         action={
-          <Button size="sm" onClick={() => setShowAdd(true)}>
-            <Plus className="h-4 w-4 mr-1" /> Add
-          </Button>
+          <div className="flex gap-2">
+            <Link href="/nutrition/search">
+              <Button size="sm" variant="secondary">
+                <Search className="h-4 w-4 mr-1" /> Search
+              </Button>
+            </Link>
+            <Button size="sm" onClick={() => setShowAdd(true)}>
+              <Plus className="h-4 w-4 mr-1" /> Add
+            </Button>
+          </div>
         }
       />
 

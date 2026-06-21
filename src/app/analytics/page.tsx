@@ -14,9 +14,11 @@ import {
   getWeightProgression,
   getCurrentStreak,
   getWorkoutFrequency,
+  getExerciseRecommendations,
 } from '@/lib/analytics';
+import { Badge } from '@/components/ui/Badge';
 import { totalVolume } from '@/lib/utils';
-import { BarChart3, Dumbbell, Flame, Target, TrendingUp, Trophy } from 'lucide-react';
+import { BarChart3, Dumbbell, Flame, Lightbulb, Target, TrendingUp, Trophy } from 'lucide-react';
 
 export default function AnalyticsPage() {
   const workouts = useAllWorkouts();
@@ -100,6 +102,32 @@ export default function AnalyticsPage() {
             <ProgressChart data={weightData} />
           </Card>
         </div>
+
+        {(() => {
+          const recs = getExerciseRecommendations(workouts, exercises);
+          if (recs.length === 0) return null;
+          return (
+            <div>
+              <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Recommendations</h2>
+              <div className="space-y-2">
+                {recs.map((rec, i) => (
+                  <Card key={i} className="flex items-center gap-3">
+                    <div className="rounded-lg bg-cyan-600/20 p-2">
+                      <Lightbulb className="h-4 w-4 text-cyan-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-zinc-100">{rec.exercise.name}</span>
+                        <Badge variant={rec.priority === 'high' ? 'warning' : 'default'}>{rec.priority}</Badge>
+                      </div>
+                      <div className="text-xs text-zinc-500 mt-0.5">{rec.reason}</div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {prs.length > 0 && (
           <div>

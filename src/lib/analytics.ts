@@ -1,4 +1,4 @@
-import { Workout, PersonalRecord, MuscleGroup } from '@/types';
+import { Workout, PersonalRecord, MuscleGroup, Exercise } from '@/types';
 import { totalVolume } from './utils';
 
 export function calculatePRs(workouts: Workout[]): PersonalRecord[] {
@@ -132,4 +132,92 @@ export function getMuscleGroupVolume(
   }
 
   return volumeMap;
+}
+
+export interface ExerciseRecommendation {
+  exercise: Exercise;
+  reason: string;
+  priority: 'high' | 'medium' | 'low';
+}
+
+export function getExerciseRecommendations(
+  workouts: Workout[],
+  allExercises: Exercise[],
+  days: number = 7
+): ExerciseRecommendation[] {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  const cutoffStr = cutoff.toISOString().split('T')[0];
+
+  const recentWorkouts = workouts.filter((w) => w.date >= cutoffStr);
+
+  const exerciseMap = new Map<string, MuscleGroup[]>();
+  allExercises.forEach((e) => exerciseMap.set(e.id, e.muscleGroups));
+
+  const groupVolume = getMuscleGroupVolume(recentWorkouts, exerciseMap, days);
+  const recentExerciseIds = new Set<string>();
+  recentWorkouts.forEach((w) => w.exercises.forEach((e) => recentExerciseIds.add(e.exerciseId)));
+
+  const allGroups: MuscleGroup[] = [
+    'chest', 'back', 'shoulders', 'biceps', 'triceps',
+    'quads', 'hamstrings', 'glutes', 'calves', 'abs',
+  ];
+
+  const volumes = allGroups.map((g) => groupVolume.get(g) ?? 0);
+  const avgVolume = volumes.reduce((a, b) => a + b, 0) / allGroups.length;
+  const underworked = allGroups.filter((g) => (groupVolume.get(g) ?? 0) < avgVolume * 0.3);
+
+  const recommendations: ExerciseRecommendation[] = [];
+
+  for (const group of underworked) {
+    const candidates = allExercises.filter(
+      (e) => e.muscleGroups.includes(group) && !recentExerciseIds.has(e.id)
+    );
+    if (candidates.length > 0) {
+      const pick = candidates[Math.floor(Math.random() * candidates.length)];
+      recommendations.push({
+        exercise: pick,
+        reason: `Your ${group.replace('_', ' ')} hasn't been trained recently`,
+        priority: (groupVolume.get(group) ?? 0) === 0 ? 'high' : 'medium',
+      });
+    }
+  }
+
+  const exerciseHistory = new Map<string, { weight: number; date: string }[]>();
+  for (const workout of workouts) {
+    for (const exercise of workout.exercises) {
+      const maxW = Math.max(
+        ...exercise.sets.filter((s) => s.completed && s.weight).map((s) => s.weight!),
+        0
+      );
+      if (maxW > 0) {
+        const history = exerciseHistory.get(exercise.exerciseId) ?? [];
+        history.push({ weight: maxW, date: workout.date });
+        exerciseHistory.set(exercise.exerciseId, history);
+      }
+    }
+  }
+
+  for (const [exId, history] of exerciseHistory) {
+    if (history.length < 3) continue;
+    const recent = history.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
+    const allSameWeight = recent.every((h) => h.weight === recent[0].weight);
+    if (allSameWeight) {
+      const ex = allExercises.find((e) => e.id === exId);
+      if (ex) {
+        recommendations.push({
+          exercise: ex,
+          reason: `Plateau detected at ${recent[0].weight} lbs — try increasing weight or reps`,
+          priority: 'low',
+        });
+      }
+    }
+  }
+
+  return recommendations
+    .sort((a, b) => {
+      const order = { high: 0, medium: 1, low: 2 };
+      return order[a.priority] - order[b.priority];
+    })
+    .slice(0, 5);
 }
