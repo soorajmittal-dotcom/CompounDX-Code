@@ -1,0 +1,106 @@
+'use client';
+
+import { use } from 'react';
+import { useWorkout } from '@/lib/db-hooks';
+import { Header } from '@/components/layout/Header';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { formatDateLong, totalVolume } from '@/lib/utils';
+import { db } from '@/lib/db';
+import { useRouter } from 'next/navigation';
+import { Trash2, Clock, Dumbbell } from 'lucide-react';
+
+export default function WorkoutDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const workout = useWorkout(id);
+  const router = useRouter();
+
+  if (!workout) {
+    return (
+      <div>
+        <Header title="Workout" showBack />
+        <div className="flex items-center justify-center h-64 text-zinc-500">Loading...</div>
+      </div>
+    );
+  }
+
+  const duration = workout.endTime && workout.startTime
+    ? Math.round((workout.endTime - workout.startTime) / 60000)
+    : null;
+
+  const handleDelete = async () => {
+    await db.workouts.delete(workout.id);
+    router.push('/workouts');
+  };
+
+  return (
+    <div>
+      <Header
+        title={workout.name}
+        showBack
+        action={
+          <button onClick={handleDelete} className="p-2 text-zinc-400 hover:text-red-400">
+            <Trash2 className="h-5 w-5" />
+          </button>
+        }
+      />
+
+      <div className="px-4 py-4 space-y-4">
+        <div className="flex items-center gap-4 text-sm text-zinc-400">
+          <span>{formatDateLong(workout.date)}</span>
+          {duration && (
+            <span className="flex items-center gap-1">
+              <Clock className="h-3.5 w-3.5" /> {duration} min
+            </span>
+          )}
+        </div>
+
+        {workout.voiceTranscript && (
+          <Card className="bg-indigo-900/10 border-indigo-800/30">
+            <p className="text-xs text-indigo-400 mb-1">Voice transcript</p>
+            <p className="text-sm text-zinc-300">{workout.voiceTranscript}</p>
+          </Card>
+        )}
+
+        <div className="space-y-3">
+          {workout.exercises.map((exercise) => {
+            const vol = totalVolume(exercise.sets);
+            return (
+              <Card key={exercise.id}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Dumbbell className="h-4 w-4 text-indigo-400" />
+                    <span className="font-medium text-sm text-zinc-100">{exercise.exerciseName}</span>
+                  </div>
+                  {vol > 0 && <Badge variant="indigo">{vol.toLocaleString()} lbs</Badge>}
+                </div>
+
+                <div className="space-y-1">
+                  <div className="grid grid-cols-4 text-[10px] text-zinc-500 uppercase tracking-wider px-1">
+                    <span>Set</span>
+                    <span>Weight</span>
+                    <span>Reps</span>
+                    <span>Status</span>
+                  </div>
+                  {exercise.sets.map((set) => (
+                    <div key={set.id} className="grid grid-cols-4 text-sm px-1 py-1">
+                      <span className="text-zinc-500">{set.setNumber}</span>
+                      <span className="text-zinc-100">{set.weight ?? '-'} {set.weightUnit}</span>
+                      <span className="text-zinc-100">{set.reps ?? '-'}</span>
+                      <span>{set.completed ? <Badge variant="success">Done</Badge> : <Badge>Skip</Badge>}</span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+
+        <Button variant="danger" onClick={handleDelete} className="w-full">
+          <Trash2 className="h-4 w-4 mr-2" /> Delete Workout
+        </Button>
+      </div>
+    </div>
+  );
+}
