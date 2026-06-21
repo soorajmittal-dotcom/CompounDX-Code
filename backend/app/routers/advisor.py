@@ -6,6 +6,8 @@ from app.engine.transfer_graph import transfer_graph
 from app.engine.spend_optimizer import spend_optimizer
 from app.engine.trip_planner import trip_planner
 from app.engine.benefits_engine import benefits_engine
+from app.engine.hotel_optimizer import hotel_optimizer
+from app.engine.goal_planner import goal_planner
 
 router = APIRouter(prefix="/api/advisor", tags=["advisor"])
 
@@ -28,9 +30,11 @@ def classify_intent(query: str) -> str:
     q = query.lower()
     if any(w in q for w in ["transfer", "convert", "move points"]):
         return "transfer"
-    if any(w in q for w in ["trip", "plan", "fly", "travel", "visit", "japan", "europe", "london", "singapore", "korea"]):
+    if any(w in q for w in ["hotel", "stay", "night", "hyatt", "marriott hotel", "hilton hotel"]):
+        return "hotel"
+    if any(w in q for w in ["trip", "plan", "fly", "travel", "visit", "japan", "europe", "london", "singapore", "korea", "flight"]):
         return "trip"
-    if any(w in q for w in ["card", "spend", "which card", "best card", "use for"]):
+    if any(w in q for w in ["recommend card", "new card", "apply", "which card", "best card", "use for", "spend"]):
         return "spend"
     if any(w in q for w in ["benefit", "lounge", "golf", "insurance", "unused"]):
         return "benefits"
@@ -38,6 +42,8 @@ def classify_intent(query: str) -> str:
         return "valuation"
     if any(w in q for w in ["renew", "cancel", "annual fee", "keep", "downgrade"]):
         return "fee_analysis"
+    if any(w in q for w in ["goal", "save", "accumulate", "target", "earn enough", "enough for", "roadmap"]):
+        return "goal"
     return "general"
 
 
@@ -204,6 +210,86 @@ def handle_fee_query(query: str) -> dict:
     }
 
 
+def handle_hotel_query(query: str) -> dict:
+    q = query.lower()
+    city = "Singapore"
+    nights = 5
+
+    city_map = {
+        "singapore": "Singapore", "bangkok": "Bangkok", "dubai": "Dubai",
+        "tokyo": "Tokyo", "london": "London", "bali": "Bali",
+        "maldives": "Maldives", "goa": "Goa", "paris": "Paris",
+    }
+    for key, val in city_map.items():
+        if key in q:
+            city = val
+            break
+
+    import re
+    night_match = re.search(r"(\d+)\s*night", q)
+    if night_match:
+        nights = int(night_match.group(1))
+
+    result = hotel_optimizer.compare_options(city, nights)
+    best = result.get("recommendations", {}).get("best_value")
+    cheapest = result.get("recommendations", {}).get("cheapest_points")
+
+    msg = f"Hotel comparison for {city}, {nights} nights:\n\n"
+    if best:
+        msg += f"**Best value:** {best['program']} {best['category']} — {best['cpp_value']} cpp ({best['total_points']:,} points)\n"
+    if cheapest:
+        msg += f"**Fewest points:** {cheapest['program']} {cheapest['category']} — {cheapest['total_points']:,} points\n"
+
+    free_nights = result.get("recommendations", {}).get("with_free_nights", [])
+    if free_nights:
+        msg += f"\n5th-night-free available at {free_nights[0]['program']} (save {free_nights[0]['nights_free']} night)"
+
+    return {
+        "type": "hotel_comparison",
+        "message": msg,
+        "data": result,
+        "recommendation": f"For {city}, {best['program']} offers the best value at {best['cpp_value']} cpp. Book {nights}+ nights at Marriott/Hilton to unlock 5th-night-free." if best else "Compare options on the Hotels page.",
+    }
+
+
+def handle_goal_query(query: str) -> dict:
+    q = query.lower()
+    destination = "Singapore"
+    cabin = "business"
+
+    dest_map = {
+        "japan": "Tokyo", "tokyo": "Tokyo", "singapore": "Singapore",
+        "london": "London", "europe": "London", "dubai": "Dubai",
+        "bangkok": "Bangkok", "maldives": "Maldives", "bali": "Bali",
+    }
+    for key, val in dest_map.items():
+        if key in q:
+            destination = val
+            break
+
+    if "economy" in q:
+        cabin = "economy"
+    elif "first" in q:
+        cabin = "first"
+
+    result = goal_planner.create_roadmap(
+        destination=destination,
+        target_date="2027-06-01",
+        cabin=cabin,
+        travelers=1,
+        current_balances=DEMO_BALANCES,
+        monthly_spend={"travel": 50000, "dining": 30000, "groceries": 25000, "fuel": 10000, "utilities": 15000, "online": 20000},
+        user_cards=[1, 2, 4, 6, 7],
+    )
+
+    return {
+        "type": "goal_roadmap",
+        "message": f"Goal roadmap for {cabin} class to {destination}:",
+        "data": result,
+        "recommendation": f"Based on your current points and spending, {'you already have enough points!' if result.get('achievable') else 'you need approximately ' + str(result.get('months_needed', 12)) + ' more months of optimized spending.'}",
+    }
+
+
 @router.post("/query")
 def advisor_query(req: AdvisorQuery):
     intent = classify_intent(req.query)
@@ -215,6 +301,8 @@ def advisor_query(req: AdvisorQuery):
         "benefits": handle_benefits_query,
         "valuation": handle_valuation_query,
         "fee_analysis": handle_fee_query,
+        "hotel": handle_hotel_query,
+        "goal": handle_goal_query,
     }
 
     handler = handlers.get(intent)
@@ -231,10 +319,12 @@ def advisor_query(req: AdvisorQuery):
         "intent": intent,
         "response": result,
         "suggestions": [
-            "Plan a trip to Singapore in Business class",
+            "Plan a trip to Japan in Business class",
             "Which card should I use for dining?",
             "Transfer HDFC to KrisFlyer or Marriott?",
             "How much are my points worth?",
+            "Compare hotels in Singapore for 5 nights",
+            "Can I save enough for Business to London?",
             "Am I using all my card benefits?",
             "Should I renew my HDFC Infinia?",
         ],
