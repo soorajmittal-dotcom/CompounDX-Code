@@ -1934,3 +1934,599 @@ body {
     color: black;
   }
 }
+
+/* ============================
+   Phase 1 — New Components
+   ============================ */
+
+/* --- Guest Manager --- */
+
+.guest-manager {
+  margin-top: 0.5rem;
+}
+
+.guest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.guest-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.guest-stats {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.guest-add {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.guest-input {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.guest-input:focus {
+  border-color: var(--primary-light);
+}
+
+.btn-compact {
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+}
+
+/* --- Suggestion Dropdown --- */
+
+.suggestion-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  z-index: 50;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.suggestion-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.suggestion-item:last-of-type {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background: var(--bg-card-hover);
+}
+
+.suggestion-name {
+  font-weight: 500;
+}
+
+.suggestion-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.suggestion-hint {
+  padding: 0.4rem 1rem;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  background: var(--bg-input);
+  text-align: center;
+}
+
+/* --- Guest List --- */
+
+.guest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.guest-row {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  transition: border-color 0.2s;
+}
+
+.guest-row:hover {
+  border-color: var(--primary-light);
+}
+
+.guest-main {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.guest-name {
+  flex: 1;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.guest-remove {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 1.3rem;
+  padding: 0 0.25rem;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.guest-remove:hover {
+  color: var(--danger);
+}
+
+.guest-prefs {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.pref-group {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.pref-chip {
+  padding: 0.3rem 0.65rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.pref-chip:hover {
+  border-color: var(--primary-light);
+  color: var(--text);
+}
+
+.pref-chip.active {
+  background: rgba(124, 58, 237, 0.15);
+  border-color: var(--primary-light);
+  color: var(--primary-light);
+  font-weight: 500;
+}
+
+.pref-chip.small {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.72rem;
+}
+
+.guest-empty {
+  text-align: center;
+  color: var(--text-dim);
+  padding: 2rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* --- RSVP Badge --- */
+
+.rsvp-badge {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  border: none;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: transform 0.15s;
+}
+
+.rsvp-badge:hover {
+  transform: scale(1.05);
+}
+
+/* --- Course Counts (Step 3) --- */
+
+.course-counts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.course-count-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.course-count-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.course-count-icon {
+  font-size: 1.3rem;
+}
+
+.course-count-label {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.counter-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.counter-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.counter-btn:hover:not(:disabled) {
+  border-color: var(--primary-light);
+  background: var(--bg-card-hover);
+}
+
+.counter-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.counter-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  min-width: 2rem;
+  text-align: center;
+  color: var(--primary-light);
+}
+
+/* --- Food Source Row --- */
+
+.food-source-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.source-chip {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: all 0.2s;
+}
+
+.source-chip:hover {
+  border-color: var(--primary-light);
+  background: var(--bg-card-hover);
+}
+
+.source-chip.active {
+  border-color: var(--primary);
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.source-chip-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.source-chip-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.skill-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* --- Cuisine Apply Bar --- */
+
+.cuisine-apply-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+/* --- Menu Target Bar --- */
+
+.menu-target-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.menu-target-progress {
+  color: var(--primary-light);
+  font-weight: 500;
+}
+
+.menu-target-bar .btn {
+  margin-left: auto;
+}
+
+/* --- Custom Item Add --- */
+
+.custom-item-add {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.custom-item-add h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-muted);
+}
+
+.custom-item-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* --- Presentation (Step 7) --- */
+
+.presentation-category {
+  margin-bottom: 2rem;
+}
+
+.presentation-category h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.presentation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.presentation-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+}
+
+.presentation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.presentation-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.presentation-idea {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.presentation-empty {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.presentation-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.presentation-textarea {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+}
+
+.presentation-textarea:focus {
+  border-color: var(--primary-light);
+}
+
+.presentation-suggestions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.presentation-summary-item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.presentation-summary-item strong {
+  color: var(--text);
+}
+
+/* --- Summary Guest List --- */
+
+.guest-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.guest-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.guest-summary-name {
+  font-weight: 500;
+}
+
+.guest-summary-tags {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.tag {
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+}
+
+.tag-veg {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+}
+
+.tag-nonveg {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.tag-rsvp-confirmed {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+}
+
+.tag-rsvp-pending {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
+
+.tag-rsvp-declined {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.tag-rsvp-maybe {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+/* --- Responsive additions --- */
+
+@media (max-width: 640px) {
+  .course-counts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .food-source-row {
+    grid-template-columns: 1fr;
+  }
+
+  .guest-prefs {
+    flex-direction: column;
+  }
+
+  .custom-item-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .menu-target-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .menu-target-bar .btn {
+    margin-left: 0;
+  }
+}

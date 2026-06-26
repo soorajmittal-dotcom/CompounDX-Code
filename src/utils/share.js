@@ -1,7 +1,7 @@
 const SHAREABLE_FIELDS = [
-  'partyType', 'guestCount', 'cuisines', 'foodSource', 'cookingSkill',
-  'budget', 'timeAvailable', 'dietaryNeeds', 'selectedMenu',
-  'selectedDrinks', 'servingStyle', 'decoration', 'includeAlcohol',
+  'partyType', 'guestList', 'courseCounts', 'foodSource', 'cookingSkill',
+  'timeAvailable', 'cuisinesByCategory', 'selectedMenu', 'customItems',
+  'selectedDrinks', 'presentations', 'servingStyle', 'decoration',
 ];
 
 export function encodePlan(state) {

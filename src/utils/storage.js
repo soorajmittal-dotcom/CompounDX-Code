@@ -25,9 +25,10 @@ function saveLocalPlans(plans) {
 }
 
 export async function savePlan(state) {
+  const guestCount = (state.guestList || []).length || state.guestCount || 0;
   const plan = {
     id: Date.now().toString(36),
-    name: `${state.partyType?.name || 'Party'} — ${state.guestCount} guests`,
+    name: `${state.partyType?.name || 'Party'} — ${guestCount} guests`,
     savedAt: new Date().toISOString(),
     state,
   };

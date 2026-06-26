@@ -5,9 +5,9 @@ import LandingPage from './components/LandingPage';
 import ThemeToggle from './components/ThemeToggle';
 import ProgressBar from './components/ProgressBar';
 import StepPartyType from './components/StepPartyType';
-import StepGuestsBudget from './components/StepGuestsBudget';
+import StepGuests from './components/StepGuests';
+import StepCourseCounts from './components/StepCourseCounts';
 import StepCuisine from './components/StepCuisine';
-import StepFoodSource from './components/StepFoodSource';
 import StepMenu from './components/StepMenu';
 import StepDrinks from './components/StepDrinks';
 import StepPresentation from './components/StepPresentation';
@@ -16,9 +16,9 @@ import './App.css';
 
 const STEP_COMPONENTS = [
   StepPartyType,
-  StepGuestsBudget,
+  StepGuests,
+  StepCourseCounts,
   StepCuisine,
-  StepFoodSource,
   StepMenu,
   StepDrinks,
   StepPresentation,
@@ -35,7 +35,7 @@ function PlannerApp() {
         dispatch({ type: 'SET_FIELD', field: key, value });
       }
       dispatch({ type: 'SET_FIELD', field: 'started', value: true });
-      dispatch({ type: 'GO_TO_STEP', step: 7 });
+      dispatch({ type: 'GO_TO_STEP', step: STEP_COMPONENTS.length - 1 });
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, []);

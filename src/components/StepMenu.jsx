@@ -1,110 +1,171 @@
 import { usePlanner } from '../context/PlannerContext';
 import { MENU_DATABASE } from '../data/menuItems';
-import { formatCurrency } from '../utils/calculations';
-import { generateRecommendation } from '../utils/recommendations';
 import { RECIPES } from '../data/recipes';
 import RecipeModal from './RecipeModal';
 import { useState } from 'react';
 
-const CATEGORY_LABELS = {
-  starters: { label: 'Starters & Appetizers', icon: '🥗' },
-  mains: { label: 'Main Courses', icon: '🍛' },
-  sides: { label: 'Sides & Accompaniments', icon: '🥖' },
-  desserts: { label: 'Desserts', icon: '🍰' },
+const CATEGORY_CONFIG = {
+  appetizers: {
+    label: 'Appetizers',
+    icon: '🥗',
+    menuKey: 'starters',
+    vegCountKey: 'vegAppetizers',
+    nonVegCountKey: 'nonVegAppetizers',
+  },
+  mains: {
+    label: 'Main Courses',
+    icon: '🍛',
+    menuKey: 'mains',
+    vegCountKey: 'vegMains',
+    nonVegCountKey: 'nonVegMains',
+  },
+  desserts: {
+    label: 'Desserts',
+    icon: '🍰',
+    menuKey: 'desserts',
+    vegCountKey: 'desserts',
+    nonVegCountKey: null,
+  },
 };
 
-export default function StepMenu() {
-  const { state, dispatch } = usePlanner();
-  const [activeCategory, setActiveCategory] = useState('starters');
-  const [filterVeg, setFilterVeg] = useState(false);
-  const [recipeItem, setRecipeItem] = useState(null);
+const CATEGORIES = ['appetizers', 'mains', 'desserts'];
+const difficultyColor = { easy: '#22c55e', medium: '#f59e0b', hard: '#ef4444' };
+const skillRank = { beginner: 0, medium: 1, advanced: 2, pro: 3 };
+const diffRank = { easy: 0, medium: 1, hard: 2 };
 
-  const allItems = {};
-  const categories = ['starters', 'mains', 'sides', 'desserts'];
+function getAvailableItems(state, category) {
+  const config = CATEGORY_CONFIG[category];
+  const cuisines = state.cuisinesByCategory[category] || [];
+  const items = [];
+  const seen = new Set();
 
-  for (const cat of categories) {
-    allItems[cat] = [];
-    for (const cuisine of state.cuisines) {
-      const cuisineMenu = MENU_DATABASE[cuisine.id];
-      if (cuisineMenu && cuisineMenu[cat]) {
-        for (const item of cuisineMenu[cat]) {
-          if (!allItems[cat].find((i) => i.name === item.name)) {
-            allItems[cat].push({ ...item, cuisine: cuisine.name });
-          }
-        }
+  for (const cuisine of cuisines) {
+    const cuisineMenu = MENU_DATABASE[cuisine.id];
+    if (!cuisineMenu) continue;
+    const catItems = cuisineMenu[config.menuKey] || [];
+    for (const item of catItems) {
+      if (!seen.has(item.name)) {
+        seen.add(item.name);
+        items.push({ ...item, cuisine: cuisine.name });
       }
     }
   }
 
-  const isVegRequired =
-    state.dietaryNeeds.includes('vegetarian') || state.dietaryNeeds.includes('vegan');
-  const shouldFilterVeg = filterVeg || isVegRequired;
+  return items;
+}
 
-  const filteredItems = shouldFilterVeg
-    ? allItems[activeCategory].filter((i) => i.veg)
-    : allItems[activeCategory];
+function getSuggestions(state, category) {
+  const config = CATEGORY_CONFIG[category];
+  const items = getAvailableItems(state, category);
+  const vegTarget = state.courseCounts[config.vegCountKey] || 0;
+  const nonVegTarget = config.nonVegCountKey ? (state.courseCounts[config.nonVegCountKey] || 0) : 0;
+  const showCookFilter = state.foodSource === 'self' || state.foodSource === 'mix';
+  const playerSkill = skillRank[state.cookingSkill] ?? 1;
 
-  const isSelected = (item) =>
-    (state.selectedMenu[activeCategory] || []).some((i) => i.name === item.name);
+  const score = (item) => {
+    let s = 0;
+    if (showCookFilter && diffRank[item.difficulty] <= playerSkill) s += 2;
+    if (showCookFilter && item.prepTime <= state.timeAvailable) s += 1;
+    if (RECIPES[item.name]) s += 1;
+    return s;
+  };
 
-  const totalSelected = categories.reduce(
+  const vegItems = items.filter((i) => i.veg).sort((a, b) => score(b) - score(a));
+  const nonVegItems = items.filter((i) => !i.veg).sort((a, b) => score(b) - score(a));
+
+  const vegSuggestions = vegItems.slice(0, vegTarget * 3);
+  const nonVegSuggestions = nonVegItems.slice(0, nonVegTarget * 3);
+
+  if (category === 'desserts') {
+    return items.sort((a, b) => score(b) - score(a)).slice(0, vegTarget * 3);
+  }
+
+  return [...vegSuggestions, ...nonVegSuggestions];
+}
+
+export default function StepMenu() {
+  const { state, dispatch } = usePlanner();
+  const [activeCategory, setActiveCategory] = useState('appetizers');
+  const [showAll, setShowAll] = useState(false);
+  const [customName, setCustomName] = useState('');
+  const [customVeg, setCustomVeg] = useState(true);
+  const [recipeItem, setRecipeItem] = useState(null);
+
+  const config = CATEGORY_CONFIG[activeCategory];
+  const suggested = getSuggestions(state, activeCategory);
+  const allItems = getAvailableItems(state, activeCategory);
+  const displayItems = showAll ? allItems : suggested;
+
+  const selected = state.selectedMenu[activeCategory] || [];
+  const isSelected = (item) => selected.some((i) => i.name === item.name);
+
+  const totalSelected = CATEGORIES.reduce(
     (sum, cat) => sum + (state.selectedMenu[cat]?.length || 0),
     0
   );
 
-  const difficultyColor = { easy: '#22c55e', medium: '#f59e0b', hard: '#ef4444' };
+  const vegTarget = state.courseCounts[config.vegCountKey] || 0;
+  const nonVegTarget = config.nonVegCountKey
+    ? state.courseCounts[config.nonVegCountKey] || 0
+    : 0;
+  const vegSelected = selected.filter((i) => i.veg).length;
+  const nonVegSelected = selected.filter((i) => !i.veg).length;
+
+  const addCustom = () => {
+    const trimmed = customName.trim();
+    if (!trimmed) return;
+    if (selected.some((i) => i.name.toLowerCase() === trimmed.toLowerCase())) return;
+    const item = {
+      name: trimmed,
+      veg: customVeg,
+      difficulty: 'medium',
+      prepTime: 30,
+      costPerServing: 0,
+      description: 'Custom item',
+      cuisine: 'Custom',
+    };
+    dispatch({ type: 'ADD_CUSTOM_ITEM', category: activeCategory, item });
+    setCustomName('');
+  };
 
   return (
     <div className="step-content">
       <h2>Build Your Menu</h2>
       <p className="step-subtitle">
-        Select dishes from your chosen cuisines ({totalSelected} items selected)
+        We've suggested items based on your choices — pick what you like or add your own
       </p>
 
-      <div className="recommend-bar">
-        <button
-          className="btn btn-accent"
-          onClick={() => {
-            const rec = generateRecommendation(state);
-            dispatch({ type: 'SET_FIELD', field: 'selectedMenu', value: rec.selectedMenu });
-            dispatch({ type: 'SET_FIELD', field: 'selectedDrinks', value: rec.selectedDrinks });
-          }}
-        >
-          Auto-Recommend Menu
-        </button>
-        <span className="recommend-hint">
-          Based on your budget, guests, time, and skill level
-        </span>
-      </div>
-
       <div className="menu-tabs">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            className={`menu-tab ${activeCategory === cat ? 'active' : ''}`}
-            onClick={() => setActiveCategory(cat)}
-          >
-            {CATEGORY_LABELS[cat].icon} {CATEGORY_LABELS[cat].label}
-            {(state.selectedMenu[cat]?.length || 0) > 0 && (
-              <span className="tab-badge">{state.selectedMenu[cat].length}</span>
-            )}
-          </button>
-        ))}
+        {CATEGORIES.map((cat) => {
+          const count = (state.selectedMenu[cat]?.length || 0);
+          return (
+            <button
+              key={cat}
+              className={`menu-tab ${activeCategory === cat ? 'active' : ''}`}
+              onClick={() => { setActiveCategory(cat); setShowAll(false); }}
+            >
+              {CATEGORY_CONFIG[cat].icon} {CATEGORY_CONFIG[cat].label}
+              {count > 0 && <span className="tab-badge">{count}</span>}
+            </button>
+          );
+        })}
       </div>
 
-      {!isVegRequired && (
-        <div className="filter-bar">
-          <button
-            className={`chip ${shouldFilterVeg ? 'selected' : ''}`}
-            onClick={() => setFilterVeg(!filterVeg)}
-          >
-            🥬 Vegetarian Only
-          </button>
-        </div>
-      )}
+      <div className="menu-target-bar">
+        <span>Target: {vegTarget} veg{nonVegTarget > 0 ? `, ${nonVegTarget} non-veg` : ''}</span>
+        <span className="menu-target-progress">
+          Selected: {vegSelected} veg{nonVegTarget > 0 ? `, ${nonVegSelected} non-veg` : ''}
+        </span>
+        <button
+          className={`btn btn-sm btn-outline ${showAll ? 'active' : ''}`}
+          onClick={() => setShowAll(!showAll)}
+        >
+          {showAll ? 'Show Suggested' : 'Show All Options'}
+        </button>
+      </div>
 
       <div className="menu-grid">
-        {filteredItems.map((item) => (
+        {displayItems.map((item) => (
           <div
             key={item.name}
             className={`menu-card ${isSelected(item) ? 'selected' : ''}`}
@@ -121,17 +182,11 @@ export default function StepMenu() {
                 {item.difficulty}
               </span>
               <span className="meta-tag">{item.prepTime}m</span>
-              <span className="meta-tag cost">
-                {formatCurrency(item.costPerServing * state.guestCount)}
-              </span>
             </div>
             {RECIPES[item.name] && (
               <button
                 className="recipe-link"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setRecipeItem(item);
-                }}
+                onClick={(e) => { e.stopPropagation(); setRecipeItem(item); }}
               >
                 View Recipe
               </button>
@@ -139,9 +194,40 @@ export default function StepMenu() {
             <div className="menu-card-check">{isSelected(item) ? '✓' : '+'}</div>
           </div>
         ))}
-        {filteredItems.length === 0 && (
-          <p className="empty-state">No items available for this category with your filters.</p>
+        {displayItems.length === 0 && (
+          <p className="empty-state">
+            No items available. Go back and select cuisines for this category.
+          </p>
         )}
+      </div>
+
+      <div className="custom-item-add">
+        <h4>Add a Custom Dish</h4>
+        <div className="custom-item-row">
+          <input
+            type="text"
+            value={customName}
+            onChange={(e) => setCustomName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && addCustom()}
+            placeholder="Dish name..."
+            className="guest-input"
+          />
+          <button
+            className={`pref-chip ${customVeg ? 'active' : ''}`}
+            onClick={() => setCustomVeg(true)}
+          >
+            🥬 Veg
+          </button>
+          <button
+            className={`pref-chip ${!customVeg ? 'active' : ''}`}
+            onClick={() => setCustomVeg(false)}
+          >
+            🍗 Non-Veg
+          </button>
+          <button className="btn btn-primary btn-compact" onClick={addCustom}>
+            Add
+          </button>
+        </div>
       </div>
 
       {recipeItem && (

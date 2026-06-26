@@ -2,9 +2,9 @@ import { usePlanner } from '../context/PlannerContext';
 
 const STEPS = [
   { label: 'Party Type', icon: '🎉' },
-  { label: 'Guests & Budget', icon: '👥' },
+  { label: 'Guests', icon: '👥' },
+  { label: 'Courses', icon: '📊' },
   { label: 'Cuisine', icon: '🍽️' },
-  { label: 'Food Source', icon: '👨‍🍳' },
   { label: 'Menu', icon: '📋' },
   { label: 'Drinks', icon: '🥤' },
   { label: 'Presentation', icon: '🎨' },

@@ -4,19 +4,21 @@ import {
   calculateBudgetBreakdown,
   calculatePrepTime,
   getDifficultyScore,
+  getHeadCount,
+  getEffectiveGuestCount,
   formatCurrency,
   formatTime,
 } from './calculations';
 
 const FOOD_SOURCE_LABELS = {
   self: 'Self Cooking',
-  catering: 'Professional Catering',
-  order: 'Restaurant Orders',
+  order: 'Order / Cater',
   mix: 'Mix & Match',
 };
 
 const CATEGORY_LABELS = {
   starters: 'Starters',
+  appetizers: 'Appetizers',
   mains: 'Main Courses',
   sides: 'Sides',
   desserts: 'Desserts',
@@ -25,12 +27,14 @@ const CATEGORY_LABELS = {
 export function exportPDF(state) {
   const doc = new jsPDF();
   const budget = calculateBudgetBreakdown(state);
-  const prepTime = calculatePrepTime(state.selectedMenu, state.selectedDrinks);
+  const prepTime = calculatePrepTime(state.selectedMenu, state.selectedDrinks || []);
   const difficulty = getDifficultyScore(state.selectedMenu);
-  const categories = ['starters', 'mains', 'sides', 'desserts'];
+  const headCount = getHeadCount(state);
+  const effectiveCount = getEffectiveGuestCount(state);
+  const guests = state.guestList || [];
+  const categories = ['appetizers', 'mains', 'desserts'];
 
   const purple = [124, 58, 237];
-  const darkBg = [26, 26, 46];
   const white = [255, 255, 255];
 
   doc.setFillColor(...purple);
@@ -51,14 +55,12 @@ export function exportPDF(state) {
 
   doc.setFont(undefined, 'normal');
   doc.setFontSize(10);
+  const vegCount = guests.filter((g) => g.diet === 'veg').length;
   const details = [
     ['Event', state.partyType?.name || 'Custom Party'],
-    ['Guests', String(state.guestCount)],
-    ['Budget', formatCurrency(state.budget)],
-    ['Cuisines', state.cuisines.map((c) => c.name).join(', ')],
+    ['Guests', `${headCount} (${vegCount} veg, ${headCount - vegCount} non-veg)`],
+    ['Servings', `${effectiveCount}x (appetite-adjusted)`],
     ['Food Source', FOOD_SOURCE_LABELS[state.foodSource] || '-'],
-    ['Serving Style', state.servingStyle?.name || '-'],
-    ['Decoration', state.decoration?.name || '-'],
     ['Prep Time', formatTime(prepTime)],
     ['Difficulty', difficulty],
   ];
@@ -71,7 +73,34 @@ export function exportPDF(state) {
     y += 6;
   }
 
-  y += 6;
+  if (guests.length > 0) {
+    y += 4;
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(...purple);
+    doc.text('Guest List', 14, y);
+    y += 4;
+
+    const guestRows = guests.map((g) => [
+      g.name,
+      g.diet === 'veg' ? 'Veg' : 'Non-Veg',
+      g.alcohol ? 'Yes' : 'No',
+      `${g.appetite}x`,
+      g.rsvp,
+    ]);
+
+    autoTable(doc, {
+      startY: y,
+      head: [['Name', 'Diet', 'Drinks', 'Appetite', 'RSVP']],
+      body: guestRows,
+      theme: 'striped',
+      headStyles: { fillColor: purple, fontSize: 8 },
+      bodyStyles: { fontSize: 8 },
+      margin: { left: 14, right: 14 },
+    });
+    y = doc.lastAutoTable.finalY + 8;
+  }
+
   doc.setFontSize(12);
   doc.setFont(undefined, 'bold');
   doc.setTextColor(...purple);
@@ -84,11 +113,11 @@ export function exportPDF(state) {
     for (const item of items) {
       menuRows.push([
         item.name,
-        CATEGORY_LABELS[cat],
+        CATEGORY_LABELS[cat] || cat,
         item.veg ? 'Yes' : 'No',
-        item.difficulty,
-        `${item.prepTime}m`,
-        formatCurrency(item.costPerServing * state.guestCount),
+        item.difficulty || '-',
+        item.prepTime ? `${item.prepTime}m` : '-',
+        item.cuisine || '-',
       ]);
     }
   }
@@ -96,7 +125,7 @@ export function exportPDF(state) {
   if (menuRows.length > 0) {
     autoTable(doc, {
       startY: y,
-      head: [['Dish', 'Category', 'Veg', 'Difficulty', 'Prep', 'Cost']],
+      head: [['Dish', 'Category', 'Veg', 'Difficulty', 'Prep', 'Cuisine']],
       body: menuRows,
       theme: 'striped',
       headStyles: { fillColor: purple, fontSize: 8 },
@@ -106,7 +135,7 @@ export function exportPDF(state) {
     y = doc.lastAutoTable.finalY + 8;
   }
 
-  if (state.selectedDrinks.length > 0) {
+  if ((state.selectedDrinks || []).length > 0) {
     if (y > 250) { doc.addPage(); y = 20; }
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
@@ -116,13 +145,12 @@ export function exportPDF(state) {
 
     const drinkRows = state.selectedDrinks.map((d) => [
       d.name,
-      d.description,
-      formatCurrency(d.costPerServing * state.guestCount),
+      d.description || '',
     ]);
 
     autoTable(doc, {
       startY: y,
-      head: [['Drink', 'Description', 'Cost']],
+      head: [['Drink', 'Description']],
       body: drinkRows,
       theme: 'striped',
       headStyles: { fillColor: purple, fontSize: 8 },
@@ -132,49 +160,27 @@ export function exportPDF(state) {
     y = doc.lastAutoTable.finalY + 8;
   }
 
-  if (y > 250) { doc.addPage(); y = 20; }
-  doc.setFontSize(12);
-  doc.setFont(undefined, 'bold');
-  doc.setTextColor(...purple);
-  doc.text('Budget Breakdown', 14, y);
-  y += 4;
-
-  const isOver = budget.total > state.budget;
-  autoTable(doc, {
-    startY: y,
-    head: [['Category', 'Amount']],
-    body: [
-      ['Food', formatCurrency(budget.food)],
-      ['Drinks', formatCurrency(budget.drinks)],
-      ['Decoration', formatCurrency(budget.decoration)],
-      ['Total', formatCurrency(budget.total)],
-      ['Budget', formatCurrency(state.budget)],
-      ['Status', isOver ? 'OVER BUDGET' : 'Within Budget'],
-      ['Per Person', formatCurrency(Math.round(budget.total / state.guestCount))],
-    ],
-    theme: 'striped',
-    headStyles: { fillColor: purple, fontSize: 8 },
-    bodyStyles: { fontSize: 8 },
-    margin: { left: 14, right: 14 },
-  });
-  y = doc.lastAutoTable.finalY + 8;
-
-  if (state.decoration) {
+  const presentations = state.presentations || {};
+  if (Object.keys(presentations).length > 0) {
     if (y > 240) { doc.addPage(); y = 20; }
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(...purple);
-    doc.text(`Decoration Checklist — ${state.decoration.name}`, 14, y);
-    y += 7;
+    doc.text('Presentation Ideas', 14, y);
+    y += 4;
 
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(60, 60, 60);
-    for (const item of state.decoration.items) {
-      doc.rect(14, y - 3, 3, 3);
-      doc.text(item, 20, y);
-      y += 6;
-    }
+    const presRows = Object.entries(presentations).map(([name, idea]) => [name, idea]);
+    autoTable(doc, {
+      startY: y,
+      head: [['Dish', 'Presentation']],
+      body: presRows,
+      theme: 'striped',
+      headStyles: { fillColor: purple, fontSize: 8 },
+      bodyStyles: { fontSize: 8 },
+      margin: { left: 14, right: 14 },
+      columnStyles: { 1: { cellWidth: 100 } },
+    });
+    y = doc.lastAutoTable.finalY + 8;
   }
 
   const pageCount = doc.internal.getNumberOfPages();

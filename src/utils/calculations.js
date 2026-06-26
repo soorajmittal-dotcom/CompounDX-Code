@@ -1,20 +1,31 @@
+export function getEffectiveGuestCount(state) {
+  const guests = state.guestList || [];
+  if (guests.length === 0) return state.guestCount || 0;
+  return guests.reduce((sum, g) => sum + (g.appetite || 1), 0);
+}
+
+export function getHeadCount(state) {
+  return (state.guestList || []).length || state.guestCount || 0;
+}
+
 export function calculateBudgetBreakdown(plan) {
-  const { guestCount, selectedMenu, selectedDrinks, decoration, servingStyle } = plan;
+  const guestCount = getEffectiveGuestCount(plan);
+  const { selectedMenu, selectedDrinks, decoration, servingStyle } = plan;
   const servingMultiplier = servingStyle?.costMultiplier || 1;
 
   let foodCost = 0;
-  const categories = ['starters', 'mains', 'sides', 'desserts'];
+  const categories = ['starters', 'mains', 'sides', 'desserts', 'appetizers'];
   for (const cat of categories) {
     const items = selectedMenu[cat] || [];
     for (const item of items) {
-      foodCost += item.costPerServing * guestCount;
+      foodCost += (item.costPerServing || 0) * guestCount;
     }
   }
   foodCost *= servingMultiplier;
 
   let drinkCost = 0;
-  for (const drink of selectedDrinks) {
-    drinkCost += drink.costPerServing * guestCount;
+  for (const drink of selectedDrinks || []) {
+    drinkCost += (drink.costPerServing || 0) * guestCount;
   }
 
   const decoCost = (decoration?.costEstimate || 0) * guestCount * 0.3;
@@ -30,7 +41,7 @@ export function calculateBudgetBreakdown(plan) {
 export function calculatePrepTime(selectedMenu, selectedDrinks) {
   let maxPrepTime = 0;
   let totalItems = 0;
-  const categories = ['starters', 'mains', 'sides', 'desserts'];
+  const categories = ['starters', 'mains', 'sides', 'desserts', 'appetizers'];
 
   for (const cat of categories) {
     const items = selectedMenu[cat] || [];
@@ -40,7 +51,6 @@ export function calculatePrepTime(selectedMenu, selectedDrinks) {
     }
   }
 
-  const parallelFactor = Math.min(totalItems, 3);
   const overheadMinutes = totalItems > 3 ? (totalItems - 3) * 15 : 0;
   return maxPrepTime + overheadMinutes;
 }
@@ -49,7 +59,7 @@ export function getDifficultyScore(selectedMenu) {
   const difficultyMap = { easy: 1, medium: 2, hard: 3 };
   let totalDifficulty = 0;
   let count = 0;
-  const categories = ['starters', 'mains', 'sides', 'desserts'];
+  const categories = ['starters', 'mains', 'sides', 'desserts', 'appetizers'];
 
   for (const cat of categories) {
     const items = selectedMenu[cat] || [];
@@ -68,7 +78,7 @@ export function getDifficultyScore(selectedMenu) {
 
 export function generateShoppingList(selectedMenu, guestCount) {
   const rawMaterials = {};
-  const categories = ['starters', 'mains', 'sides', 'desserts'];
+  const categories = ['starters', 'mains', 'sides', 'desserts', 'appetizers'];
 
   for (const cat of categories) {
     const items = selectedMenu[cat] || [];
@@ -78,7 +88,7 @@ export function generateShoppingList(selectedMenu, guestCount) {
         rawMaterials[key] = {
           name: item.name,
           servings: guestCount,
-          estimatedCost: Math.round(item.costPerServing * guestCount * 100) / 100,
+          estimatedCost: Math.round((item.costPerServing || 0) * guestCount * 100) / 100,
           category: cat,
         };
       }

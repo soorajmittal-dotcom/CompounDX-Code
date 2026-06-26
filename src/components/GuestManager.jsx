@@ -1,46 +1,73 @@
 import { usePlanner } from '../context/PlannerContext';
-import { useState } from 'react';
-import { DIETARY_OPTIONS } from '../data/cuisines';
+import { useState, useEffect, useRef } from 'react';
+import { searchGuests, saveGuestProfile } from '../utils/guestDb';
+
+const DIET_OPTIONS = [
+  { id: 'veg', label: 'Veg', icon: '🥬' },
+  { id: 'nonveg', label: 'Non-Veg', icon: '🍗' },
+];
+
+const APPETITE_OPTIONS = [
+  { value: 0.5, label: 'Light (0.5x)' },
+  { value: 1, label: 'Regular (1x)' },
+  { value: 2, label: 'Heavy (2x)' },
+];
 
 export default function GuestManager() {
   const { state, dispatch } = usePlanner();
-  const [newName, setNewName] = useState('');
+  const [name, setName] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const inputRef = useRef(null);
   const guests = state.guestList || [];
 
-  const setGuests = (list) => {
-    dispatch({ type: 'SET_FIELD', field: 'guestList', value: list });
-    dispatch({ type: 'SET_FIELD', field: 'guestCount', value: Math.max(list.length, 2) });
+  const vegCount = guests.filter((g) => g.diet === 'veg').length;
+  const nonVegCount = guests.filter((g) => g.diet !== 'veg').length;
+  const alcoholCount = guests.filter((g) => g.alcohol).length;
+  const noAlcoholCount = guests.length - alcoholCount;
+
+  useEffect(() => {
+    if (name.length >= 1) {
+      searchGuests(name).then((results) => {
+        const existing = guests.map((g) => g.name.toLowerCase());
+        const filtered = results.filter(
+          (r) => !existing.includes(r.name.toLowerCase())
+        );
+        setSuggestions(filtered);
+        setShowSuggestions(filtered.length > 0);
+      });
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [name]);
+
+  const addGuest = (profile) => {
+    const guestName = profile ? profile.name : name.trim();
+    if (!guestName) return;
+    if (guests.some((g) => g.name.toLowerCase() === guestName.toLowerCase())) return;
+
+    const guest = {
+      id: Date.now(),
+      name: guestName,
+      diet: profile?.diet || 'nonveg',
+      alcohol: profile?.alcohol ?? true,
+      appetite: profile?.appetite || 1,
+      rsvp: 'confirmed',
+    };
+    dispatch({ type: 'ADD_GUEST', guest });
+    saveGuestProfile(guest);
+    setName('');
+    setShowSuggestions(false);
   };
 
-  const addGuest = () => {
-    const name = newName.trim();
-    if (!name) return;
-    setGuests([...guests, { id: Date.now(), name, dietary: [], rsvp: 'pending' }]);
-    setNewName('');
+  const updateGuest = (id, updates) => {
+    dispatch({ type: 'UPDATE_GUEST', id, updates });
+    const guest = guests.find((g) => g.id === id);
+    if (guest) saveGuestProfile({ ...guest, ...updates });
   };
 
-  const removeGuest = (id) => setGuests(guests.filter((g) => g.id !== id));
-
-  const toggleDietary = (id, dietId) => {
-    setGuests(
-      guests.map((g) => {
-        if (g.id !== id) return g;
-        const has = g.dietary.includes(dietId);
-        return { ...g, dietary: has ? g.dietary.filter((d) => d !== dietId) : [...g.dietary, dietId] };
-      })
-    );
-  };
-
-  const cycleRsvp = (id) => {
-    const order = ['pending', 'confirmed', 'declined', 'maybe'];
-    setGuests(
-      guests.map((g) => {
-        if (g.id !== id) return g;
-        const next = order[(order.indexOf(g.rsvp) + 1) % order.length];
-        return { ...g, rsvp: next };
-      })
-    );
-  };
+  const removeGuest = (id) => dispatch({ type: 'REMOVE_GUEST', id });
 
   const rsvpColors = {
     pending: '#6b7280',
@@ -48,9 +75,7 @@ export default function GuestManager() {
     declined: '#ef4444',
     maybe: '#f59e0b',
   };
-
-  const confirmed = guests.filter((g) => g.rsvp === 'confirmed').length;
-  const pending = guests.filter((g) => g.rsvp === 'pending').length;
+  const rsvpOrder = ['confirmed', 'pending', 'maybe', 'declined'];
 
   return (
     <div className="guest-manager">
@@ -58,23 +83,46 @@ export default function GuestManager() {
         <h3>Guest List</h3>
         {guests.length > 0 && (
           <span className="guest-stats">
-            {confirmed} confirmed, {pending} pending, {guests.length} total
+            {guests.length} guests &middot; {vegCount} veg, {nonVegCount} non-veg &middot; {alcoholCount} drinks, {noAlcoholCount} no-alcohol
           </span>
         )}
       </div>
 
-      <div className="guest-add">
+      <div className="guest-add" style={{ position: 'relative' }}>
         <input
+          ref={inputRef}
           type="text"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && addGuest()}
-          placeholder="Add guest name..."
+          onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+          onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+          placeholder="Type guest name..."
           className="guest-input"
         />
-        <button className="btn btn-primary btn-compact" onClick={addGuest}>
+        <button className="btn btn-primary btn-compact" onClick={() => addGuest()}>
           Add
         </button>
+        {showSuggestions && (
+          <div className="suggestion-dropdown">
+            {suggestions.map((s, i) => (
+              <button
+                key={i}
+                className="suggestion-item"
+                onMouseDown={() => addGuest(s)}
+              >
+                <span className="suggestion-name">{s.name}</span>
+                <span className="suggestion-meta">
+                  {s.diet === 'veg' ? '🥬' : '🍗'}
+                  {s.alcohol ? ' 🍺' : ' 🚫'}
+                  {' '}
+                  {s.appetite}x
+                </span>
+              </button>
+            ))}
+            <div className="suggestion-hint">Saved guests — click to add with preferences</div>
+          </div>
+        )}
       </div>
 
       {guests.length > 0 && (
@@ -85,27 +133,50 @@ export default function GuestManager() {
                 <button
                   className="rsvp-badge"
                   style={{ background: rsvpColors[g.rsvp] }}
-                  onClick={() => cycleRsvp(g.id)}
-                  title="Click to change RSVP status"
+                  onClick={() => {
+                    const next = rsvpOrder[(rsvpOrder.indexOf(g.rsvp) + 1) % rsvpOrder.length];
+                    updateGuest(g.id, { rsvp: next });
+                  }}
+                  title="Click to change RSVP"
                 >
                   {g.rsvp}
                 </button>
                 <span className="guest-name">{g.name}</span>
                 <button className="guest-remove" onClick={() => removeGuest(g.id)}>
-                  x
+                  &times;
                 </button>
               </div>
-              <div className="guest-dietary">
-                {DIETARY_OPTIONS.filter((d) => d.id !== 'none').map((d) => (
+              <div className="guest-prefs">
+                <div className="pref-group">
+                  {DIET_OPTIONS.map((d) => (
+                    <button
+                      key={d.id}
+                      className={`pref-chip ${g.diet === d.id ? 'active' : ''}`}
+                      onClick={() => updateGuest(g.id, { diet: d.id })}
+                    >
+                      {d.icon} {d.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="pref-group">
                   <button
-                    key={d.id}
-                    className={`dietary-chip ${g.dietary.includes(d.id) ? 'active' : ''}`}
-                    onClick={() => toggleDietary(g.id, d.id)}
-                    title={d.label}
+                    className={`pref-chip ${g.alcohol ? 'active' : ''}`}
+                    onClick={() => updateGuest(g.id, { alcohol: !g.alcohol })}
                   >
-                    {d.icon}
+                    {g.alcohol ? '🍺 Drinks' : '🚫 No Alcohol'}
                   </button>
-                ))}
+                </div>
+                <div className="pref-group">
+                  {APPETITE_OPTIONS.map((a) => (
+                    <button
+                      key={a.value}
+                      className={`pref-chip small ${g.appetite === a.value ? 'active' : ''}`}
+                      onClick={() => updateGuest(g.id, { appetite: a.value })}
+                    >
+                      {a.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           ))}
@@ -114,7 +185,8 @@ export default function GuestManager() {
 
       {guests.length === 0 && (
         <p className="guest-empty">
-          Add guests to track RSVPs and individual dietary needs, or use the slider above for a quick count.
+          Add guests to set their dietary preferences, drink choices, and appetite levels.
+          Previously added guests will be auto-suggested.
         </p>
       )}
     </div>
