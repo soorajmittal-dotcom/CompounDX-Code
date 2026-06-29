@@ -14,13 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CompounDX - Workout Tracker",
-  description: "Track workouts, nutrition, and progression with voice input",
+  title: "ICSE Prep - Board Exam Practice",
+  description: "ICSE Class 10 board exam preparation with adaptive drills, mock exams, and performance tracking",
   manifest: "/CompounDX-Code/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "CompounDX",
+    title: "ICSE Prep",
   },
 };
 

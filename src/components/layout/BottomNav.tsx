@@ -2,13 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Dumbbell, Apple, BarChart3, Settings } from 'lucide-react';
+import { Home, BookOpen, Clock, BarChart3, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const tabs = [
   { href: '/', label: 'Home', icon: Home },
-  { href: '/workouts', label: 'Workouts', icon: Dumbbell },
-  { href: '/nutrition', label: 'Nutrition', icon: Apple },
+  { href: '/practice', label: 'Practice', icon: BookOpen },
+  { href: '/mock', label: 'Mock Exam', icon: Clock },
   { href: '/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];

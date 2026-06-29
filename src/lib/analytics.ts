@@ -1,223 +1,135 @@
-import { Workout, PersonalRecord, MuscleGroup, Exercise } from '@/types';
-import { totalVolume } from './utils';
+import { QuestionAttempt, Subject, TopicMastery, MasteryLevel } from '@/types';
 
-export function calculatePRs(workouts: Workout[]): PersonalRecord[] {
-  const prMap = new Map<string, PersonalRecord>();
-
-  for (const workout of workouts) {
-    for (const exercise of workout.exercises) {
-      const existing = prMap.get(exercise.exerciseId);
-      let maxWeight = existing?.maxWeight ?? 0;
-      let maxReps = existing?.maxReps ?? 0;
-      let maxVol = existing?.maxVolume ?? 0;
-      let prDate = existing?.date ?? workout.date;
-
-      for (const set of exercise.sets) {
-        if (!set.completed) continue;
-        if (set.weight && set.weight > maxWeight) {
-          maxWeight = set.weight;
-          prDate = workout.date;
-        }
-        if (set.reps && set.reps > maxReps) {
-          maxReps = set.reps;
-        }
-        const vol = (set.weight ?? 0) * (set.reps ?? 0);
-        if (vol > maxVol) maxVol = vol;
-      }
-
-      prMap.set(exercise.exerciseId, {
-        exerciseId: exercise.exerciseId,
-        exerciseName: exercise.exerciseName,
-        maxWeight,
-        maxReps,
-        maxVolume: maxVol,
-        date: prDate,
-      });
-    }
-  }
-
-  return Array.from(prMap.values()).sort((a, b) => b.maxWeight - a.maxWeight);
+export function calculateAccuracy(attempts: QuestionAttempt[]): number {
+  if (attempts.length === 0) return 0;
+  const correct = attempts.filter((a) => a.isCorrect).length;
+  return Math.round((correct / attempts.length) * 100);
 }
 
-export function getVolumeOverTime(
-  workouts: Workout[],
-  exerciseId?: string
-): { date: string; volume: number }[] {
-  const volumeByDate = new Map<string, number>();
-
-  for (const workout of workouts) {
-    for (const exercise of workout.exercises) {
-      if (exerciseId && exercise.exerciseId !== exerciseId) continue;
-      const vol = totalVolume(exercise.sets);
-      volumeByDate.set(workout.date, (volumeByDate.get(workout.date) ?? 0) + vol);
-    }
+export function calculateSubjectAccuracy(attempts: QuestionAttempt[]): Record<Subject, number> {
+  const grouped: Record<string, QuestionAttempt[]> = {};
+  for (const a of attempts) {
+    if (!grouped[a.subject]) grouped[a.subject] = [];
+    grouped[a.subject].push(a);
   }
-
-  return Array.from(volumeByDate.entries())
-    .map(([date, volume]) => ({ date, volume }))
-    .sort((a, b) => a.date.localeCompare(b.date));
+  const result: Record<string, number> = {};
+  for (const [subject, subjectAttempts] of Object.entries(grouped)) {
+    result[subject] = calculateAccuracy(subjectAttempts);
+  }
+  return result as Record<Subject, number>;
 }
 
-export function getWeightProgression(
-  workouts: Workout[],
-  exerciseId: string
-): { date: string; maxWeight: number }[] {
-  const data: { date: string; maxWeight: number }[] = [];
+export function getWeakTopics(
+  attempts: QuestionAttempt[],
+  limit = 5
+): { subject: Subject; chapter: string; topic: string; accuracy: number; attempts: number }[] {
+  const topicMap: Record<string, { subject: Subject; chapter: string; topic: string; total: number; correct: number }> = {};
 
-  for (const workout of workouts) {
-    for (const exercise of workout.exercises) {
-      if (exercise.exerciseId !== exerciseId) continue;
-      const maxW = Math.max(
-        ...exercise.sets.filter((s) => s.completed && s.weight).map((s) => s.weight!),
-        0
-      );
-      if (maxW > 0) data.push({ date: workout.date, maxWeight: maxW });
+  for (const a of attempts) {
+    const key = `${a.subject}|${a.chapter}|${a.topic}`;
+    if (!topicMap[key]) {
+      topicMap[key] = { subject: a.subject, chapter: a.chapter, topic: a.topic, total: 0, correct: 0 };
     }
+    topicMap[key].total++;
+    if (a.isCorrect) topicMap[key].correct++;
   }
 
-  return data.sort((a, b) => a.date.localeCompare(b.date));
+  return Object.values(topicMap)
+    .filter((t) => t.total >= 2)
+    .map((t) => ({
+      subject: t.subject,
+      chapter: t.chapter,
+      topic: t.topic,
+      accuracy: Math.round((t.correct / t.total) * 100),
+      attempts: t.total,
+    }))
+    .sort((a, b) => a.accuracy - b.accuracy)
+    .slice(0, limit);
 }
 
-export function getWorkoutFrequency(workouts: Workout[], days: number = 30): number {
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - days);
-  const cutoffStr = cutoff.toISOString().split('T')[0];
-  return workouts.filter((w) => w.date >= cutoffStr).length;
+export function getTimeBleedQuestions(
+  attempts: QuestionAttempt[],
+  limit = 5
+): { questionId: string; timeSpent: number; marksTotal: number; timePerMark: number }[] {
+  return attempts
+    .map((a) => ({
+      questionId: a.questionId,
+      timeSpent: a.timeSpent,
+      marksTotal: a.marksTotal,
+      timePerMark: a.marksTotal > 0 ? a.timeSpent / a.marksTotal : a.timeSpent,
+    }))
+    .sort((a, b) => b.timePerMark - a.timePerMark)
+    .slice(0, limit);
 }
 
-export function getCurrentStreak(workouts: Workout[]): number {
-  if (workouts.length === 0) return 0;
+export function getDailyProgress(
+  attempts: QuestionAttempt[],
+  days = 14
+): { date: string; total: number; correct: number; accuracy: number }[] {
+  const now = new Date();
+  const result: { date: string; total: number; correct: number; accuracy: number }[] = [];
 
-  const dates = [...new Set(workouts.map((w) => w.date))].sort().reverse();
-  const today = new Date().toISOString().split('T')[0];
-
-  if (dates[0] !== today) {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    if (dates[0] !== yesterday.toISOString().split('T')[0]) return 0;
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().split('T')[0];
+    const dayAttempts = attempts.filter((a) => {
+      const aDate = new Date(a.timestamp).toISOString().split('T')[0];
+      return aDate === dateStr;
+    });
+    result.push({
+      date: dateStr,
+      total: dayAttempts.length,
+      correct: dayAttempts.filter((a) => a.isCorrect).length,
+      accuracy: calculateAccuracy(dayAttempts),
+    });
   }
 
-  let streak = 1;
-  for (let i = 1; i < dates.length; i++) {
-    const curr = new Date(dates[i - 1]);
-    const prev = new Date(dates[i]);
-    const diff = (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24);
-    if (diff <= 1) streak++;
-    else break;
-  }
-
-  return streak;
+  return result;
 }
 
-export function getMuscleGroupVolume(
-  workouts: Workout[],
-  exerciseMap: Map<string, MuscleGroup[]>,
-  days: number = 7
-): Map<MuscleGroup, number> {
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - days);
-  const cutoffStr = cutoff.toISOString().split('T')[0];
-
-  const volumeMap = new Map<MuscleGroup, number>();
-
-  for (const workout of workouts) {
-    if (workout.date < cutoffStr) continue;
-    for (const exercise of workout.exercises) {
-      const groups = exerciseMap.get(exercise.exerciseId) ?? [];
-      const vol = totalVolume(exercise.sets);
-      for (const group of groups) {
-        volumeMap.set(group, (volumeMap.get(group) ?? 0) + vol);
-      }
-    }
-  }
-
-  return volumeMap;
+export function computeMasteryLevel(totalAttempts: number, correctAttempts: number, streak: number): MasteryLevel {
+  if (totalAttempts === 0) return 'unstarted';
+  const accuracy = correctAttempts / totalAttempts;
+  if (accuracy >= 0.8 && streak >= 3 && totalAttempts >= 5) return 'mastered';
+  if (accuracy >= 0.5 && totalAttempts >= 3) return 'practicing';
+  return 'learning';
 }
 
-export interface ExerciseRecommendation {
-  exercise: Exercise;
-  reason: string;
-  priority: 'high' | 'medium' | 'low';
-}
-
-export function getExerciseRecommendations(
-  workouts: Workout[],
-  allExercises: Exercise[],
-  days: number = 7
-): ExerciseRecommendation[] {
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - days);
-  const cutoffStr = cutoff.toISOString().split('T')[0];
-
-  const recentWorkouts = workouts.filter((w) => w.date >= cutoffStr);
-
-  const exerciseMap = new Map<string, MuscleGroup[]>();
-  allExercises.forEach((e) => exerciseMap.set(e.id, e.muscleGroups));
-
-  const groupVolume = getMuscleGroupVolume(recentWorkouts, exerciseMap, days);
-  const recentExerciseIds = new Set<string>();
-  recentWorkouts.forEach((w) => w.exercises.forEach((e) => recentExerciseIds.add(e.exerciseId)));
-
-  const allGroups: MuscleGroup[] = [
-    'chest', 'back', 'shoulders', 'biceps', 'triceps',
-    'quads', 'hamstrings', 'glutes', 'calves', 'abs',
-  ];
-
-  const volumes = allGroups.map((g) => groupVolume.get(g) ?? 0);
-  const avgVolume = volumes.reduce((a, b) => a + b, 0) / allGroups.length;
-  const underworked = allGroups.filter((g) => (groupVolume.get(g) ?? 0) < avgVolume * 0.3);
-
-  const recommendations: ExerciseRecommendation[] = [];
-
-  for (const group of underworked) {
-    const candidates = allExercises.filter(
-      (e) => e.muscleGroups.includes(group) && !recentExerciseIds.has(e.id)
-    );
-    if (candidates.length > 0) {
-      const pick = candidates[Math.floor(Math.random() * candidates.length)];
-      recommendations.push({
-        exercise: pick,
-        reason: `Your ${group.replace('_', ' ')} hasn't been trained recently`,
-        priority: (groupVolume.get(group) ?? 0) === 0 ? 'high' : 'medium',
-      });
-    }
+export function updateTopicMastery(
+  existing: TopicMastery | undefined,
+  subject: Subject,
+  chapter: string,
+  topic: string,
+  isCorrect: boolean
+): TopicMastery {
+  const now = Date.now();
+  if (!existing) {
+    return {
+      id: `${subject}-${chapter}-${topic}`,
+      subject,
+      chapter,
+      topic,
+      totalAttempts: 1,
+      correctAttempts: isCorrect ? 1 : 0,
+      lastAttempted: now,
+      lastCorrect: isCorrect ? now : undefined,
+      streak: isCorrect ? 1 : 0,
+      masteryLevel: 'learning',
+    };
   }
 
-  const exerciseHistory = new Map<string, { weight: number; date: string }[]>();
-  for (const workout of workouts) {
-    for (const exercise of workout.exercises) {
-      const maxW = Math.max(
-        ...exercise.sets.filter((s) => s.completed && s.weight).map((s) => s.weight!),
-        0
-      );
-      if (maxW > 0) {
-        const history = exerciseHistory.get(exercise.exerciseId) ?? [];
-        history.push({ weight: maxW, date: workout.date });
-        exerciseHistory.set(exercise.exerciseId, history);
-      }
-    }
-  }
+  const totalAttempts = existing.totalAttempts + 1;
+  const correctAttempts = existing.correctAttempts + (isCorrect ? 1 : 0);
+  const streak = isCorrect ? existing.streak + 1 : 0;
 
-  for (const [exId, history] of exerciseHistory) {
-    if (history.length < 3) continue;
-    const recent = history.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
-    const allSameWeight = recent.every((h) => h.weight === recent[0].weight);
-    if (allSameWeight) {
-      const ex = allExercises.find((e) => e.id === exId);
-      if (ex) {
-        recommendations.push({
-          exercise: ex,
-          reason: `Plateau detected at ${recent[0].weight} lbs — try increasing weight or reps`,
-          priority: 'low',
-        });
-      }
-    }
-  }
-
-  return recommendations
-    .sort((a, b) => {
-      const order = { high: 0, medium: 1, low: 2 };
-      return order[a.priority] - order[b.priority];
-    })
-    .slice(0, 5);
+  return {
+    ...existing,
+    totalAttempts,
+    correctAttempts,
+    lastAttempted: now,
+    lastCorrect: isCorrect ? now : existing.lastCorrect,
+    streak,
+    masteryLevel: computeMasteryLevel(totalAttempts, correctAttempts, streak),
+  };
 }
