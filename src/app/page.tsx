@@ -6,9 +6,9 @@ import { SUBJECTS, SUBJECT_COLORS } from '@/lib/subjects';
 import { Card } from '@/components/ui/Card';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { subjectLabel } from '@/lib/utils';
-import { Flame, Target, BookOpen, TrendingUp, AlertTriangle, ArrowRight, GraduationCap } from 'lucide-react';
+import { Flame, Target, BookOpen, TrendingUp, AlertTriangle, ArrowRight, GraduationCap, Zap, RotateCcw, Calendar } from 'lucide-react';
 import Link from 'next/link';
-import { format } from 'date-fns';
+import { format, differenceInDays, parseISO } from 'date-fns';
 
 export default function HomePage() {
   const todayAttempts = useTodayAttempts();
@@ -38,6 +38,32 @@ export default function HomePage() {
         <p className="text-sm text-zinc-500">{format(new Date(), 'EEEE, MMMM d')}</p>
       </div>
 
+      {settings?.examDate && (() => {
+        const daysLeft = differenceInDays(parseISO(settings.examDate), new Date());
+        if (daysLeft > 0) {
+          return (
+            <Card className="bg-indigo-950/20 border-indigo-500/20">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-indigo-400" />
+                  <div>
+                    <div className="text-sm font-semibold text-zinc-100">Exam Countdown</div>
+                    <div className="text-xs text-zinc-500">{format(parseISO(settings.examDate), 'MMMM d, yyyy')}</div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className={`text-2xl font-bold ${daysLeft <= 30 ? 'text-red-400' : daysLeft <= 90 ? 'text-amber-400' : 'text-indigo-400'}`}>
+                    {daysLeft}
+                  </div>
+                  <div className="text-[10px] text-zinc-500">days left</div>
+                </div>
+              </div>
+            </Card>
+          );
+        }
+        return null;
+      })()}
+
       <div className="grid grid-cols-2 gap-3">
         <Link href="/practice">
           <Card className="flex items-center gap-3 hover:border-indigo-500/50 transition-colors cursor-pointer active:scale-95">
@@ -58,6 +84,28 @@ export default function HomePage() {
             <div>
               <div className="text-sm font-semibold text-zinc-100">Mock Exam</div>
               <div className="text-xs text-zinc-500">Timed test</div>
+            </div>
+          </Card>
+        </Link>
+        <Link href="/drill">
+          <Card className="flex items-center gap-3 hover:border-amber-500/50 transition-colors cursor-pointer active:scale-95">
+            <div className="rounded-lg bg-amber-600/20 p-2.5">
+              <Zap className="h-5 w-5 text-amber-400" />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-zinc-100">Drill</div>
+              <div className="text-xs text-zinc-500">Weak topics</div>
+            </div>
+          </Card>
+        </Link>
+        <Link href="/review">
+          <Card className="flex items-center gap-3 hover:border-red-500/50 transition-colors cursor-pointer active:scale-95">
+            <div className="rounded-lg bg-red-600/20 p-2.5">
+              <RotateCcw className="h-5 w-5 text-red-400" />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-zinc-100">Review</div>
+              <div className="text-xs text-zinc-500">Past mistakes</div>
             </div>
           </Card>
         </Link>
