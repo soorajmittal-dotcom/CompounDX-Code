@@ -11,6 +11,7 @@ import StepCuisine from './components/StepCuisine';
 import StepMenu from './components/StepMenu';
 import StepDrinks from './components/StepDrinks';
 import StepPresentation from './components/StepPresentation';
+import StepRawMaterials from './components/StepRawMaterials';
 import StepSummary from './components/StepSummary';
 import './App.css';
 
@@ -22,6 +23,7 @@ const STEP_COMPONENTS = [
   StepMenu,
   StepDrinks,
   StepPresentation,
+  StepRawMaterials,
   StepSummary,
 ];
 

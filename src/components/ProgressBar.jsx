@@ -8,6 +8,7 @@ const STEPS = [
   { label: 'Menu', icon: '📋' },
   { label: 'Drinks', icon: '🥤' },
   { label: 'Presentation', icon: '🎨' },
+  { label: 'Materials', icon: '🛒' },
   { label: 'Summary', icon: '✅' },
 ];
 
