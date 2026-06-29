@@ -2741,6 +2741,316 @@ body {
   }
 }
 
+/* --- Budget Input --- */
+
+.budget-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.currency-toggle {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.budget-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.budget-currency {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  padding: 0.6rem 0.6rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.budget-amount-input {
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
+  max-width: 140px;
+}
+
+.budget-per-head {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* --- Tolerance --- */
+
+.tolerance-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem;
+}
+
+/* --- Bulk Add --- */
+
+.bulk-add-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.bulk-add-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+}
+
+.bulk-count-input {
+  width: 50px;
+  padding: 0.35rem 0.5rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* --- Guest Restrictions --- */
+
+.guest-restrictions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--border);
+}
+
+.restriction-active {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  color: var(--danger) !important;
+}
+
+/* --- Menu Dietary Conflict --- */
+
+.conflict-warning {
+  font-size: 0.75rem;
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.08);
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  margin-top: 0.4rem;
+}
+
+.menu-card.has-conflict {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.menu-cost-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+}
+
+.over-budget {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.under-budget {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.menu-portion-hint {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+/* --- Progress Bar Enhancements --- */
+
+.progress-bar-container {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+}
+
+.progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+}
+
+.progress-meta-item {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.progress-meta-item.over-budget {
+  color: var(--danger);
+}
+
+.skip-to-summary {
+  background: none;
+  border: none;
+  color: var(--primary-light);
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-weight: 500;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.skip-to-summary:hover {
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.progress-step.skipped {
+  opacity: 0.4;
+}
+
+/* --- Budget in Summary --- */
+
+.budget-total-display {
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+.budget-amount {
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-light);
+}
+
+.budget-status {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.budget-status.over {
+  color: var(--danger);
+}
+
+.budget-status.under {
+  color: var(--success);
+}
+
+.budget-total-display .budget-per-head {
+  display: block;
+  margin-top: 0.25rem;
+}
+
+/* --- Timeline Enhancements --- */
+
+.timeline-card {
+  border-left: 3px solid var(--accent);
+}
+
+.contention-warnings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.contention-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--text);
+}
+
+.contention-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.timeline-section .timeline-task {
+  font-weight: 700;
+  color: var(--primary-light);
+  font-size: 0.9rem;
+}
+
+.timeline-equipment {
+  display: inline-flex;
+  gap: 0.25rem;
+  margin-left: 0.4rem;
+}
+
+.equip-tag {
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--primary-light);
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.timeline-contention {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  cursor: help;
+}
+
+/* --- Restriction Tags --- */
+
+.tag-restriction {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: var(--danger);
+  font-size: 0.65rem;
+}
+
+/* --- Store Sections --- */
+
+.rm-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.rm-store-section h4.rm-section-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.rm-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 /* --- Raw Materials & Cutlery (Step 8) --- */
 
 .step-subtitle {

@@ -22,6 +22,13 @@ const COURSE_FIELDS = [
   { key: 'drinks', label: 'Drinks', icon: '🥤', max: 8 },
 ];
 
+const TOLERANCE_OPTIONS = [
+  { value: 1.0, label: 'Exact (no buffer)', desc: 'Risk running short' },
+  { value: 1.15, label: '15% extra (Recommended)', desc: 'Small buffer, minimal waste' },
+  { value: 1.3, label: '30% extra', desc: 'Comfortable safety net' },
+  { value: 1.5, label: '50% extra', desc: 'Generous leftovers guaranteed' },
+];
+
 export default function StepCourseCounts() {
   const { state, dispatch } = usePlanner();
   const counts = state.courseCounts;
@@ -36,8 +43,8 @@ export default function StepCourseCounts() {
     dispatch({ type: 'SET_FIELD', field, value });
 
   const showCookingOptions = state.foodSource === 'self' || state.foodSource === 'mix';
-
   const totalCourses = Object.values(counts).reduce((a, b) => a + b, 0);
+  const currencySymbol = state.currency === 'INR' ? '₹' : '$';
 
   return (
     <div className="step-content">
@@ -86,6 +93,59 @@ export default function StepCourseCounts() {
               <span>{src.icon}</span>
               <span className="source-chip-name">{src.name}</span>
               <span className="source-chip-desc">{src.desc}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="form-section">
+        <label className="form-label">Budget (optional)</label>
+        <div className="budget-input-row">
+          <div className="currency-toggle">
+            <button
+              className={`pref-chip ${state.currency === 'INR' ? 'active' : ''}`}
+              onClick={() => setField('currency', 'INR')}
+            >
+              ₹ INR
+            </button>
+            <button
+              className={`pref-chip ${state.currency === 'USD' ? 'active' : ''}`}
+              onClick={() => setField('currency', 'USD')}
+            >
+              $ USD
+            </button>
+          </div>
+          <div className="budget-input-group">
+            <span className="budget-currency">{currencySymbol}</span>
+            <input
+              type="number"
+              min="0"
+              step={state.currency === 'INR' ? 500 : 10}
+              value={state.budget || ''}
+              onChange={(e) => setField('budget', Number(e.target.value) || 0)}
+              placeholder={state.currency === 'INR' ? '15000' : '200'}
+              className="guest-input budget-amount-input"
+            />
+          </div>
+          {state.budget > 0 && (
+            <span className="budget-per-head">
+              {currencySymbol}{Math.round(state.budget / Math.max(1, guests.length))}/person
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="form-section">
+        <label className="form-label">Leftover Tolerance</label>
+        <div className="tolerance-row">
+          {TOLERANCE_OPTIONS.map((t) => (
+            <button
+              key={t.value}
+              className={`source-chip ${state.leftoverTolerance === t.value ? 'active' : ''}`}
+              onClick={() => setField('leftoverTolerance', t.value)}
+            >
+              <span className="source-chip-name">{t.label}</span>
+              <span className="source-chip-desc">{t.desc}</span>
             </button>
           ))}
         </div>

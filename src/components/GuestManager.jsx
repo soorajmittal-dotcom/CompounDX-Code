@@ -1,4 +1,4 @@
-import { usePlanner } from '../context/PlannerContext';
+import { usePlanner, DIETARY_TAGS } from '../context/PlannerContext';
 import { useState, useEffect, useRef } from 'react';
 import { searchGuests, saveGuestProfile } from '../utils/guestDb';
 
@@ -13,11 +13,16 @@ const APPETITE_OPTIONS = [
   { value: 2, label: 'Heavy (2x)' },
 ];
 
+const RESTRICTION_KEYS = Object.keys(DIETARY_TAGS);
+
 export default function GuestManager() {
   const { state, dispatch } = usePlanner();
   const [name, setName] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showBulkAdd, setShowBulkAdd] = useState(false);
+  const [bulkCount, setBulkCount] = useState(4);
+  const [bulkDiet, setBulkDiet] = useState('nonveg');
   const inputRef = useRef(null);
   const guests = state.guestList || [];
 
@@ -54,6 +59,7 @@ export default function GuestManager() {
       alcohol: profile?.alcohol ?? true,
       appetite: profile?.appetite || 1,
       rsvp: 'confirmed',
+      restrictions: profile?.restrictions || [],
     };
     dispatch({ type: 'ADD_GUEST', guest });
     saveGuestProfile(guest);
@@ -61,10 +67,38 @@ export default function GuestManager() {
     setShowSuggestions(false);
   };
 
+  const addBulkGuests = () => {
+    const newGuests = [];
+    const startNum = guests.length + 1;
+    for (let i = 0; i < bulkCount; i++) {
+      newGuests.push({
+        id: Date.now() + i,
+        name: `Guest ${startNum + i}`,
+        diet: bulkDiet,
+        alcohol: bulkDiet === 'nonveg',
+        appetite: 1,
+        rsvp: 'confirmed',
+        restrictions: [],
+      });
+    }
+    dispatch({ type: 'ADD_GUESTS_BULK', guests: newGuests });
+    setShowBulkAdd(false);
+  };
+
   const updateGuest = (id, updates) => {
     dispatch({ type: 'UPDATE_GUEST', id, updates });
     const guest = guests.find((g) => g.id === id);
     if (guest) saveGuestProfile({ ...guest, ...updates });
+  };
+
+  const toggleRestriction = (id, restriction) => {
+    const guest = guests.find((g) => g.id === id);
+    if (!guest) return;
+    const current = guest.restrictions || [];
+    const updated = current.includes(restriction)
+      ? current.filter((r) => r !== restriction)
+      : [...current, restriction];
+    updateGuest(id, { restrictions: updated });
   };
 
   const removeGuest = (id) => dispatch({ type: 'REMOVE_GUEST', id });
@@ -77,6 +111,11 @@ export default function GuestManager() {
   };
   const rsvpOrder = ['confirmed', 'pending', 'maybe', 'declined'];
 
+  const allRestrictions = new Set();
+  for (const g of guests) {
+    for (const r of g.restrictions || []) allRestrictions.add(r);
+  }
+
   return (
     <div className="guest-manager">
       <div className="guest-header">
@@ -84,6 +123,9 @@ export default function GuestManager() {
         {guests.length > 0 && (
           <span className="guest-stats">
             {guests.length} guests &middot; {vegCount} veg, {nonVegCount} non-veg &middot; {alcoholCount} drinks, {noAlcoholCount} no-alcohol
+            {allRestrictions.size > 0 && (
+              <> &middot; {[...allRestrictions].map((r) => DIETARY_TAGS[r]?.icon).join('')}</>
+            )}
           </span>
         )}
       </div>
@@ -103,6 +145,13 @@ export default function GuestManager() {
         <button className="btn btn-primary btn-compact" onClick={() => addGuest()}>
           Add
         </button>
+        <button
+          className="btn btn-outline btn-compact"
+          onClick={() => setShowBulkAdd(!showBulkAdd)}
+          title="Quick-add multiple guests"
+        >
+          +{bulkCount}
+        </button>
         {showSuggestions && (
           <div className="suggestion-dropdown">
             {suggestions.map((s, i) => (
@@ -117,6 +166,7 @@ export default function GuestManager() {
                   {s.alcohol ? ' 🍺' : ' 🚫'}
                   {' '}
                   {s.appetite}x
+                  {(s.restrictions || []).map((r) => ` ${DIETARY_TAGS[r]?.icon || ''}`)}
                 </span>
               </button>
             ))}
@@ -124,6 +174,39 @@ export default function GuestManager() {
           </div>
         )}
       </div>
+
+      {showBulkAdd && (
+        <div className="bulk-add-panel">
+          <div className="bulk-add-row">
+            <label>
+              Add
+              <input
+                type="number"
+                min="1"
+                max="50"
+                value={bulkCount}
+                onChange={(e) => setBulkCount(Math.max(1, Math.min(50, Number(e.target.value))))}
+                className="bulk-count-input"
+              />
+              guests as
+            </label>
+            <div className="pref-group">
+              {DIET_OPTIONS.map((d) => (
+                <button
+                  key={d.id}
+                  className={`pref-chip ${bulkDiet === d.id ? 'active' : ''}`}
+                  onClick={() => setBulkDiet(d.id)}
+                >
+                  {d.icon} {d.label}
+                </button>
+              ))}
+            </div>
+            <button className="btn btn-primary btn-compact" onClick={addBulkGuests}>
+              Add All
+            </button>
+          </div>
+        </div>
+      )}
 
       {guests.length > 0 && (
         <div className="guest-list">
@@ -178,6 +261,22 @@ export default function GuestManager() {
                   ))}
                 </div>
               </div>
+              <div className="guest-restrictions">
+                {RESTRICTION_KEYS.map((key) => {
+                  const tag = DIETARY_TAGS[key];
+                  const active = (g.restrictions || []).includes(key);
+                  return (
+                    <button
+                      key={key}
+                      className={`pref-chip small ${active ? 'active restriction-active' : ''}`}
+                      onClick={() => toggleRestriction(g.id, key)}
+                      title={tag.label}
+                    >
+                      {tag.icon} {tag.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </div>
@@ -185,7 +284,7 @@ export default function GuestManager() {
 
       {guests.length === 0 && (
         <p className="guest-empty">
-          Add guests to set their dietary preferences, drink choices, and appetite levels.
+          Add guests individually or use the +N button to quick-add a group.
           Previously added guests will be auto-suggested.
         </p>
       )}

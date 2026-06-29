@@ -1,13 +1,13 @@
-import { createContext, useContext, useReducer } from 'react';
+import { createContext, useContext, useReducer, useEffect } from 'react';
 
 const PlannerContext = createContext(null);
+
+const PERSIST_KEY = 'partyplanner_state';
 
 const initialState = {
   started: false,
   step: 0,
-  // Step 1: Guests
   guestList: [],
-  // Step 2: Course counts
   courseCounts: {
     vegAppetizers: 2,
     nonVegAppetizers: 1,
@@ -16,31 +16,38 @@ const initialState = {
     desserts: 2,
     drinks: 3,
   },
-  // Cooking config
-  foodSource: null, // 'self', 'order', 'mix'
+  foodSource: null,
   cookingSkill: 'medium',
   timeAvailable: 180,
-  // Step 3: Cuisines per course
   cuisinesByCategory: {
     appetizers: [],
     mains: [],
     desserts: [],
   },
-  // Step 4: Selected menu
   selectedMenu: { appetizers: [], mains: [], desserts: [] },
   customItems: { appetizers: [], mains: [], desserts: [] },
-  // Step 5: Drinks
   selectedDrinks: [],
   includeAlcohol: false,
-  // Step 6: Presentation
   presentations: {},
-  // Budget
-  budget: 500,
-  // Serving & decoration
+  budget: 0,
+  currency: 'INR',
   servingStyle: null,
   decoration: null,
   partyType: null,
+  leftoverTolerance: 1.15,
 };
+
+const DIETARY_TAGS = {
+  jain: { label: 'Jain', icon: '🙏', excludes: ['onion', 'garlic', 'potato', 'carrot', 'beetroot', 'radish', 'turnip', 'ginger'] },
+  vegan: { label: 'Vegan', icon: '🌱', excludes: ['paneer', 'cream', 'yogurt', 'cheese', 'butter', 'ghee', 'milk', 'egg', 'honey', 'mascarpone', 'ricotta', 'mozzarella', 'parmesan'] },
+  glutenFree: { label: 'Gluten-Free', icon: '🌾', excludes: ['flour', 'bread', 'pasta', 'noodle', 'naan', 'pita', 'tortilla', 'baguette', 'bun', 'lasagna', 'ladyfinger', 'bhature', 'soy sauce'] },
+  nutFree: { label: 'Nut-Free', icon: '🥜', excludes: ['peanut', 'almond', 'cashew', 'walnut', 'pistachio', 'pine nut'] },
+  halal: { label: 'Halal', icon: '☪️', excludeItems: ['pork', 'bacon', 'ham', 'lard', 'wine', 'beer', 'rum', 'liqueur'] },
+  noPork: { label: 'No Pork', icon: '🐷', excludeItems: ['pork', 'bacon', 'ham', 'lard', 'prosciutto', 'pancetta'] },
+  noBeef: { label: 'No Beef', icon: '🐄', excludeItems: ['beef', 'steak', 'ground beef'] },
+};
+
+export { DIETARY_TAGS };
 
 function reducer(state, action) {
   switch (action.type) {
@@ -58,24 +65,23 @@ function reducer(state, action) {
       );
       return { ...state, guestList: list };
     }
-    case 'ADD_GUEST': {
+    case 'ADD_GUEST':
       return { ...state, guestList: [...state.guestList, action.guest] };
+    case 'ADD_GUESTS_BULK': {
+      return { ...state, guestList: [...state.guestList, ...action.guests] };
     }
-    case 'REMOVE_GUEST': {
+    case 'REMOVE_GUEST':
       return { ...state, guestList: state.guestList.filter((g) => g.id !== action.id) };
-    }
-    case 'SET_COURSE_COUNT': {
+    case 'SET_COURSE_COUNT':
       return {
         ...state,
         courseCounts: { ...state.courseCounts, [action.field]: action.value },
       };
-    }
-    case 'SET_CUISINE_FOR_CATEGORY': {
+    case 'SET_CUISINE_FOR_CATEGORY':
       return {
         ...state,
         cuisinesByCategory: { ...state.cuisinesByCategory, [action.category]: action.cuisines },
       };
-    }
     case 'TOGGLE_MENU_ITEM': {
       const { category, item } = action;
       const current = state.selectedMenu[category] || [];
@@ -102,21 +108,45 @@ function reducer(state, action) {
         : [...state.selectedDrinks, action.drink];
       return { ...state, selectedDrinks: updated };
     }
-    case 'SET_PRESENTATION': {
+    case 'SET_PRESENTATION':
       return {
         ...state,
         presentations: { ...state.presentations, [action.itemName]: action.presentation },
       };
-    }
     case 'RESET':
-      return initialState;
+      return { ...initialState };
     default:
       return state;
   }
 }
 
+function loadPersistedState() {
+  try {
+    const saved = localStorage.getItem(PERSIST_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { ...initialState, ...parsed };
+    }
+  } catch {}
+  return initialState;
+}
+
+function persistState(state) {
+  try {
+    const { started, ...rest } = state;
+    if (started) {
+      localStorage.setItem(PERSIST_KEY, JSON.stringify(state));
+    }
+  } catch {}
+}
+
 export function PlannerProvider({ children }) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, null, loadPersistedState);
+
+  useEffect(() => {
+    persistState(state);
+  }, [state]);
+
   return <PlannerContext.Provider value={{ state, dispatch }}>{children}</PlannerContext.Provider>;
 }
 
