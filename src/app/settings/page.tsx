@@ -1,195 +1,165 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { Header } from '@/components/layout/Header';
+import { useState, useEffect } from 'react';
+import { useSettings } from '@/lib/db-hooks';
+import { db } from '@/lib/db';
+import { SUBJECTS } from '@/lib/subjects';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { useSettings } from '@/lib/db-hooks';
-import { db } from '@/lib/db';
-import { exportAllData, importData } from '@/lib/export';
-import { UserSettings } from '@/types';
-import { Download, Upload, Trash2, Save } from 'lucide-react';
+import { Subject } from '@/types';
+import { Save, GraduationCap, Trash2 } from 'lucide-react';
 
 export default function SettingsPage() {
   const settings = useSettings();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [message, setMessage] = useState('');
+  const [name, setName] = useState('');
+  const [dailyGoal, setDailyGoal] = useState(20);
+  const [targetScore, setTargetScore] = useState(90);
+  const [examDate, setExamDate] = useState('');
+  const [selectedSubjects, setSelectedSubjects] = useState<Subject[]>([]);
+  const [saved, setSaved] = useState(false);
 
-  if (!settings) {
-    return (
-      <div>
-        <Header title="Settings" />
-        <div className="flex items-center justify-center h-64 text-zinc-500">Loading...</div>
-      </div>
-    );
-  }
-
-  const update = async (updates: Partial<UserSettings>) => {
-    await db.settings.update('user-settings', updates);
-  };
-
-  const handleExport = async () => {
-    const data = await exportAllData();
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `compoundx-export-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    setMessage('Data exported successfully');
-  };
-
-  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const text = await file.text();
-      const result = await importData(text);
-      setMessage(`Imported ${result.workouts} workouts, ${result.nutrition} nutrition entries`);
-    } catch {
-      setMessage('Failed to import data. Check the file format.');
+  useEffect(() => {
+    if (settings) {
+      setName(settings.name ?? '');
+      setDailyGoal(settings.dailyGoal);
+      setTargetScore(settings.targetScore ?? 90);
+      setExamDate(settings.examDate ?? '');
+      setSelectedSubjects(settings.subjects);
     }
-    e.target.value = '';
+  }, [settings]);
+
+  const handleSave = async () => {
+    await db.settings.put({
+      id: 'student-settings',
+      name: name || undefined,
+      dailyGoal,
+      targetScore,
+      examDate: examDate || undefined,
+      subjects: selectedSubjects,
+    });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
   };
 
-  const handleClearAll = async () => {
-    if (window.confirm('Are you sure? This will delete ALL your data permanently.')) {
-      await Promise.all([
-        db.workouts.clear(),
-        db.nutrition.clear(),
-      ]);
-      setMessage('All data cleared');
+  const toggleSubject = (subject: Subject) => {
+    setSelectedSubjects((prev) =>
+      prev.includes(subject)
+        ? prev.filter((s) => s !== subject)
+        : [...prev, subject]
+    );
+  };
+
+  const handleClearData = async () => {
+    if (confirm('This will delete all your practice data, scores, and progress. Are you sure?')) {
+      await db.attempts.clear();
+      await db.sessions.clear();
+      await db.mastery.clear();
+      window.location.reload();
     }
   };
 
   return (
-    <div>
-      <Header title="Settings" />
+    <div className="px-4 py-6 space-y-5">
+      <div className="flex items-center gap-2">
+        <GraduationCap className="h-5 w-5 text-indigo-400" />
+        <h1 className="text-xl font-bold text-zinc-100">Settings</h1>
+      </div>
 
-      <div className="px-4 py-4 space-y-5">
-        {message && (
-          <div className="p-3 rounded-xl bg-indigo-900/20 text-indigo-400 text-sm">
-            {message}
-          </div>
-        )}
-
-        <div>
-          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Units</h2>
-          <Card className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-zinc-300">Weight Unit</span>
-              <div className="flex gap-1">
-                {(['lbs', 'kg'] as const).map((unit) => (
-                  <button
-                    key={unit}
-                    onClick={() => update({ weightUnit: unit })}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                      settings.weightUnit === unit ? 'bg-indigo-600 text-white' : 'bg-zinc-800 text-zinc-400'
-                    }`}
-                  >
-                    {unit}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-zinc-300">Distance Unit</span>
-              <div className="flex gap-1">
-                {(['mi', 'km'] as const).map((unit) => (
-                  <button
-                    key={unit}
-                    onClick={() => update({ distanceUnit: unit })}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                      settings.distanceUnit === unit ? 'bg-indigo-600 text-white' : 'bg-zinc-800 text-zinc-400'
-                    }`}
-                  >
-                    {unit}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        <div>
-          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Nutrition Goals</h2>
-          <Card className="space-y-3">
+      <div>
+        <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-2">Profile</h2>
+        <Card className="space-y-3">
+          <div>
+            <label className="text-xs text-zinc-500 mb-1 block">Name</label>
             <Input
-              label="Daily Calories"
-              type="number"
-              inputMode="numeric"
-              value={settings.calorieGoal}
-              onChange={(e) => update({ calorieGoal: Number(e.target.value) })}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
             />
-            <div className="grid grid-cols-3 gap-3">
-              <Input
-                label="Protein (g)"
-                type="number"
-                inputMode="numeric"
-                value={settings.proteinGoal}
-                onChange={(e) => update({ proteinGoal: Number(e.target.value) })}
-              />
-              <Input
-                label="Carbs (g)"
-                type="number"
-                inputMode="numeric"
-                value={settings.carbGoal}
-                onChange={(e) => update({ carbGoal: Number(e.target.value) })}
-              />
-              <Input
-                label="Fat (g)"
-                type="number"
-                inputMode="numeric"
-                value={settings.fatGoal}
-                onChange={(e) => update({ fatGoal: Number(e.target.value) })}
-              />
-            </div>
-          </Card>
-        </div>
-
-        <div>
-          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Data</h2>
-          <div className="space-y-2">
-            <Button variant="secondary" onClick={handleExport} className="w-full">
-              <Download className="h-4 w-4 mr-2" /> Export Data
-            </Button>
-            <Button variant="secondary" onClick={() => fileInputRef.current?.click()} className="w-full">
-              <Upload className="h-4 w-4 mr-2" /> Import Data
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              onChange={handleImport}
-              className="hidden"
-            />
-            <Button variant="danger" onClick={handleClearAll} className="w-full">
-              <Trash2 className="h-4 w-4 mr-2" /> Clear All Data
-            </Button>
           </div>
-        </div>
+          <div>
+            <label className="text-xs text-zinc-500 mb-1 block">Target Score (%)</label>
+            <Input
+              type="number"
+              value={targetScore}
+              onChange={(e) => setTargetScore(parseInt(e.target.value) || 0)}
+              min={0}
+              max={100}
+            />
+          </div>
+          <div>
+            <label className="text-xs text-zinc-500 mb-1 block">Exam Date</label>
+            <Input
+              type="date"
+              value={examDate}
+              onChange={(e) => setExamDate(e.target.value)}
+            />
+          </div>
+        </Card>
+      </div>
 
-        <div>
-          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Integrations</h2>
-          <Card>
-            <div className="space-y-3 text-sm text-zinc-500">
-              <div className="flex items-center justify-between">
-                <span>Apple Health</span>
-                <span className="text-xs bg-zinc-800 px-2 py-0.5 rounded">Coming Soon</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Google Fit</span>
-                <span className="text-xs bg-zinc-800 px-2 py-0.5 rounded">Coming Soon</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Strava</span>
-                <span className="text-xs bg-zinc-800 px-2 py-0.5 rounded">Coming Soon</span>
-              </div>
-            </div>
-          </Card>
-        </div>
+      <div>
+        <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-2">Daily Goal</h2>
+        <Card>
+          <label className="text-xs text-zinc-500 mb-1 block">Questions per day</label>
+          <div className="flex gap-2">
+            {[10, 20, 30, 50].map((n) => (
+              <button
+                key={n}
+                onClick={() => setDailyGoal(n)}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  dailyGoal === n
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      <div>
+        <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-2">Subjects</h2>
+        <Card>
+          <div className="grid grid-cols-2 gap-2">
+            {SUBJECTS.map((subject) => {
+              const isSelected = selectedSubjects.includes(subject.id);
+              return (
+                <button
+                  key={subject.id}
+                  onClick={() => toggleSubject(subject.id)}
+                  className={`py-2 px-3 rounded-lg text-sm font-medium text-left transition-colors ${
+                    isSelected
+                      ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
+                      : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 border border-transparent'
+                  }`}
+                >
+                  {subject.name}
+                </button>
+              );
+            })}
+          </div>
+        </Card>
+      </div>
+
+      <Button onClick={handleSave} className="w-full">
+        <Save className="h-4 w-4 mr-2" />
+        {saved ? 'Saved!' : 'Save Settings'}
+      </Button>
+
+      <div>
+        <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-2">Data</h2>
+        <Card>
+          <Button variant="danger" onClick={handleClearData} className="w-full" size="sm">
+            <Trash2 className="h-4 w-4 mr-2" />
+            Clear All Practice Data
+          </Button>
+          <p className="text-[10px] text-zinc-600 mt-2 text-center">
+            This will permanently delete all your progress and scores.
+          </p>
+        </Card>
       </div>
     </div>
   );
