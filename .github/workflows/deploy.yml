@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main, claude/fitness-app-workout-log-wyp7yr]
+    branches: [main, claude/fitness-app-workout-log-wyp7yr, claude/icse-exam-prep-app-4y0pwr]
 
 permissions:
   contents: read
