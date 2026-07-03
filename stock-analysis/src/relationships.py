@@ -50,6 +50,50 @@ def build_graph(corr: pd.DataFrame, direct_threshold: float = 0.55) -> nx.Graph:
     return g
 
 
+def classify_edges(
+    corr_long: pd.DataFrame,
+    corr_short: pd.DataFrame,
+    threshold: float = 0.55,
+) -> pd.DataFrame:
+    """Tag pairs by whether the relationship holds across windows.
+
+        stable   - |corr| >= threshold in BOTH the long and short window
+        emerging - genuinely new: strong in the short window (with a higher
+                   bar, short windows are noisy) while clearly weak long-term
+        fading   - was strong long-term but has clearly decoupled recently
+
+    Emerging/fading demand a real gap between the two windows - a pair at
+    0.56 short / 0.54 long is just a stable-ish pair straddling the cutoff,
+    not a regime change, and is not worth flagging.
+    """
+    emerge_hi, weak_lo = threshold + 0.15, threshold - 0.20
+    common = [c for c in corr_long.columns if c in corr_short.columns]
+    rows = []
+    for i, a in enumerate(common):
+        for b in common[i + 1:]:
+            cl = corr_long.loc[a, b] if b in corr_long.index else float("nan")
+            cs = corr_short.loc[a, b] if b in corr_short.index else float("nan")
+            al = abs(cl) if pd.notna(cl) else 0.0
+            as_ = abs(cs) if pd.notna(cs) else 0.0
+            if al >= threshold and as_ >= threshold:
+                tag = "stable"
+            elif as_ >= emerge_hi and al < weak_lo:
+                tag = "emerging"
+            elif al >= threshold and as_ < weak_lo:
+                tag = "fading"
+            else:
+                continue
+            rows.append(
+                {
+                    "a": a, "b": b,
+                    "corr_long": round(float(cl), 3) if pd.notna(cl) else None,
+                    "corr_short": round(float(cs), 3) if pd.notna(cs) else None,
+                    "tag": tag,
+                }
+            )
+    return pd.DataFrame(rows)
+
+
 def indirect_neighbors(g: nx.Graph, symbol: str, max_hops: int = 2) -> dict[str, int]:
     """Symbols reachable within max_hops that are NOT direct neighbours,
     i.e. stocks that are indirectly related through common links."""

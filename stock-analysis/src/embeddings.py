@@ -78,6 +78,40 @@ def cluster_embeddings(emb: pd.DataFrame, n_clusters: int = 14, random_state: in
     return pd.DataFrame(rows)
 
 
+def latent_neighbors(
+    emb: pd.DataFrame,
+    exclude: dict[str, set[str]] | None = None,
+    k: int = 5,
+) -> dict[str, list[tuple[str, float]]]:
+    """Nearest neighbours in the autoencoder latent space, per symbol.
+
+    `exclude` maps symbol -> set of symbols to skip (typically its *direct*
+    correlation partners), so what remains is the indirect signal: stocks
+    that behave alike without moving together day-to-day - "behavioral
+    twins" the correlation graph can't see.
+    """
+    x = emb.values
+    norms = np.linalg.norm(x, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0
+    unit = x / norms
+    sim = unit @ unit.T
+    syms = list(emb.index)
+    out: dict[str, list[tuple[str, float]]] = {}
+    for i, sym in enumerate(syms):
+        skip = (exclude or {}).get(sym, set())
+        order = np.argsort(-sim[i])
+        picks: list[tuple[str, float]] = []
+        for j in order:
+            other = syms[j]
+            if other == sym or other in skip:
+                continue
+            picks.append((other, round(float(sim[i, j]), 3)))
+            if len(picks) == k:
+                break
+        out[sym] = picks
+    return out
+
+
 def sector_cluster_agreement(cluster_df: pd.DataFrame) -> float:
     """Adjusted Rand Index between price-behavior clusters and official
     sector labels. ~0 = clusters look nothing like sectors (price action is
