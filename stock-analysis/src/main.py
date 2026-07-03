@@ -27,6 +27,7 @@ from relationships import classify_edges, correlation_matrix, index_exposure
 from rotation import sector_rotation, stock_rotation
 from sector_strength import sector_strength_timeseries
 from sectors import INDEX_SYMBOLS, get_sector
+from macro import macro_alert_lines, macro_snapshot, measured_sensitivities
 from transitions import alerts_markdown, edge_changes, index_relationship_shifts, quadrant_transitions
 
 LONG_WINDOW = 365
@@ -162,6 +163,12 @@ def build_analysis(input_path: str) -> dict:
         "transitions": trans,
         "edgeChanges": edge_delta,
         "indexShifts": idx_shifts,
+        "macro": {
+            **macro_snapshot(),
+            "measured": measured_sensitivities(
+                r_long, {s: get_sector(s)[0] for s in corr_long.columns if s not in INDEX_SYMBOLS}
+            ),
+        },
         "sectorRotation": sector_rot.to_dict("records"),
         "stockRotation": stock_rot.drop(columns=["industry"]).to_dict("records"),
         "stocks": stocks,
@@ -194,6 +201,9 @@ def run(input_path: str, outdir: str) -> None:
     digest = alerts_markdown(
         analysis["transitions"], analysis["edgeChanges"], analysis["asOf"], analysis["indexShifts"]
     )
+    macro_lines = macro_alert_lines(analysis["macro"])
+    if macro_lines:
+        digest += "\n## Macro flags\n" + "\n".join(macro_lines) + "\n"
     (out / "alerts.md").write_text(digest)
 
     build_dashboard_html(analysis, str(out / "dashboard.html"))

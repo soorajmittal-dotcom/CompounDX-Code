@@ -100,6 +100,13 @@
     <div class="tiles" id="tiles"></div>
   </header>
 
+  <section id="macroSection">
+    <h2>Macro context</h2>
+    <p class="note" id="macroNote"></p>
+    <div class="tiles" id="macroTiles"></div>
+    <div id="macroSens" style="margin-top:16px"></div>
+  </section>
+
   <section>
     <h2>What changed this week</h2>
     <p class="note">Quadrant crossings over the last 5 sessions — the backtest says the signal lives in these
@@ -200,6 +207,47 @@ function hideTip() { tooltip.style.display = "none"; }
     <div class="tile"><div class="tile-label">21-session drift</div><div class="tile-value ${dir}">${t.medianDelta>0?"+":""}${t.medianDelta}</div><div class="tile-sub">median momentum change</div></div>
     <div class="tile"><div class="tile-label">Relationships</div><div class="tile-value">${ec.stable||0}</div>
       <div class="tile-sub">stable · ${ec.emerging||0} emerging · ${ec.fading||0} fading</div></div>`;
+})();
+
+/* ---------- macro context ---------- */
+(function macro() {
+  const m = DATA.macro || {};
+  if (!m.factors || !m.factors.length) { $("#macroSection").style.display = "none"; return; }
+  const chg = (v) => v == null ? "" :
+    `<span class="${v >= 0 ? "pos" : "neg"}">${v > 0 ? "+" : ""}${v.toFixed(1)}%</span>`;
+  $("#macroNote").innerHTML =
+    `Auto-collected on each refresh (as of <b>${m.asOf}</b>, ${m.historyRows} day${m.historyRows === 1 ? "" : "s"} of history). ` +
+    (m.measured ? "Sector sensitivities below are <b>measured</b> from accumulated history."
+     : "Until ~60 days of history accumulate, the factor→sector map below shows <b>prior expectations</b>, not measured values.");
+  $("#macroTiles").innerHTML =
+    m.factors.map(f => `
+      <div class="tile"><div class="tile-label">${esc(f.label)}</div>
+      <div class="tile-value">${f.unit === "%" ? f.value.toLocaleString("en-IN") + "%" : esc(f.unit) + f.value.toLocaleString("en-IN")}</div>
+      <div class="tile-sub">${chg(f.chg1)}${f.chg1 != null ? " 1d" : "level"}${f.chg5 != null ? " · " + chg(f.chg5) + " 5d" : ""}</div></div>`).join("")
+    + m.flows.map(fl => {
+      const streak = fl.streak || 0;
+      const streakTxt = Math.abs(streak) >= 2
+        ? ` · ${Math.abs(streak)}d ${streak > 0 ? "buy" : "sell"} streak` : "";
+      return `<div class="tile"><div class="tile-label">${esc(fl.label)}</div>
+      <div class="tile-value ${fl.value >= 0 ? "pos" : "neg"}">${fl.value > 0 ? "+" : ""}${fl.value.toLocaleString("en-IN")}</div>
+      <div class="tile-sub">${fl.sum5 != null ? (fl.sum5 > 0 ? "+" : "") + fl.sum5.toLocaleString("en-IN") + " cr 5d" : "today"}${streakTxt}</div></div>`;
+    }).join("");
+
+  if (m.measured) {
+    $("#macroSens").innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Factor (daily change)</th><th>Most positively linked sectors</th><th>Most negatively linked</th></tr></thead>
+      <tbody>${m.measured.map(r => `<tr><td>${esc(r.factor)}</td>
+        <td>${r.mostPositive.map(x => `${esc(x.sector)} <span class="pos">${x.corr}</span>`).join(" · ")}</td>
+        <td>${r.mostNegative.map(x => `${esc(x.sector)} <span class="neg">${x.corr}</span>`).join(" · ")}</td></tr>`).join("")}
+      </tbody></table></div>`;
+  } else if (m.priorSensitivities) {
+    $("#macroSens").innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>If this happens…</th><th>Usually helps</th><th>Usually hurts</th></tr></thead>
+      <tbody>${m.priorSensitivities.map(r => `<tr><td>${esc(r.factor)}</td>
+        <td>${r.helps.map(esc).join(" · ") || "–"}</td>
+        <td>${r.hurts.map(esc).join(" · ") || "–"}</td></tr>`).join("")}
+      </tbody></table></div>`;
+  }
 })();
 
 /* ---------- what changed this week ---------- */
