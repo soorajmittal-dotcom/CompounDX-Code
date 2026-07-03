@@ -258,10 +258,16 @@ deteriorating names. It is not a standalone strategy to be levered.</div>
 
 <h2>4 · How to read each section of the terminal</h2>
 
+<h3>Regime banner (read this before anything else)</h3>
+<p>The colored strip at the very top is the synthesis: one verdict — <b>RISK-ON / NEUTRAL / RISK-OFF</b> —
+voted by breadth, drift, correlation dispersion, VIX, FII flow streaks, and rupee trend (each chip shows its
+vote; hover for what it measures). The verdict <b>gates everything below it</b>: in RISK-OFF, entries need
+extra confirmation and smaller size, and index-level decisions dominate stock-picking. A regime <i>change</i>
+is flagged in the banner and the daily digest — the change matters more than the level.</p>
+
 <h3>Header tiles</h3>
 <p><b>Breadth</b> = share of stocks with positive momentum; <b>21-session drift</b> = median momentum change
-(market direction); <b>Relationships</b> = count of stable / emerging / fading pairs. Read these first —
-they set how much to trust everything below (see regime rule above).</p>
+(market direction); <b>Relationships</b> = count of stable / emerging / fading pairs.</p>
 
 <h3>What changed this week</h3>
 <p>The action section — four tables of quadrant crossings (the rules in §3 map one-to-one onto them) plus

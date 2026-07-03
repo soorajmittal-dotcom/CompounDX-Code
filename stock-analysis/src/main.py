@@ -29,6 +29,7 @@ from rotation import sector_rotation, stock_rotation
 from sector_strength import sector_strength_timeseries
 from sectors import INDEX_SYMBOLS, get_sector
 from macro import macro_alert_lines, macro_snapshot, measured_sensitivities
+from regime import regime_dial
 from transitions import alerts_markdown, edge_changes, index_relationship_shifts, quadrant_transitions
 
 LONG_WINDOW = 365
@@ -149,9 +150,13 @@ def build_analysis(input_path: str) -> dict:
     # ---- sector strength history (monthly) ----
     sector_ts = sector_strength_timeseries(df, col="M").resample("MS").mean().round(1)
 
-    # ---- market breadth tiles ----
+    # ---- market breadth tiles + regime dial ----
     breadth = float((stock_rot["score"] >= 0).mean())
     med_delta = float(stock_rot["delta"].median())
+    snapshot = macro_snapshot()
+    regime = regime_dial(breadth, med_delta, corr_short, corr_long, snapshot)
+    print(f"Regime: {regime['verdict']} (score {regime['score']:+d} from {regime['nVoting']} signals)"
+          + (f" - CHANGED from {regime['changedFrom']}" if regime["changedFrom"] else ""))
 
     top_stable = (
         edges[edges["tag"] == "stable"]
@@ -176,8 +181,9 @@ def build_analysis(input_path: str) -> dict:
         "transitions": trans,
         "edgeChanges": edge_delta,
         "indexShifts": idx_shifts,
+        "regime": regime,
         "macro": {
-            **macro_snapshot(),
+            **snapshot,
             "measured": measured_sensitivities(
                 r_long, {s: get_sector(s)[0] for s in corr_long.columns if s not in INDEX_SYMBOLS}
             ),
@@ -216,6 +222,10 @@ def run(input_path: str, outdir: str) -> None:
         analysis["transitions"], analysis["edgeChanges"], analysis["asOf"], analysis["indexShifts"]
     )
     macro_lines = macro_alert_lines(analysis["macro"])
+    reg = analysis["regime"]
+    if reg.get("changedFrom"):
+        macro_lines.insert(0, f"- **REGIME CHANGE: {reg['changedFrom']} -> {reg['verdict']}** "
+                              f"(score {reg['score']:+d}) - {reg['guidance']}")
     if macro_lines:
         digest += "\n## Macro flags\n" + "\n".join(macro_lines) + "\n"
     (out / "alerts.md").write_text(digest)
