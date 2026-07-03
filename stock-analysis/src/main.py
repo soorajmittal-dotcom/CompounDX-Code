@@ -83,6 +83,7 @@ def run(input_path: str, outdir: str, lookback_days: int, direct_threshold: floa
         g=g, emb=emb, cluster_df=cluster_df, sector_ts=sector_ts,
         sector_ranking=ranking, agreement_score=agreement, outliers=outliers,
         index_exposure=idx_exp, out_path=str(out / "dashboard.html"),
+        as_of=str(df["Date"].max().date()), lookback_days=lookback_days,
     )
     print(f"Done. Outputs written to {out}/")
 
