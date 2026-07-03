@@ -103,7 +103,8 @@ def run_backtest(input_path: str) -> dict:
 
     periods = pd.DataFrame(period_rows)
     deciles = pd.DataFrame(decile_rows)
-    spread = pd.DataFrame(spread_curve)
+    # a period can lack Leading or Lagging members entirely -> NaN spread
+    spread = pd.DataFrame(spread_curve).dropna(subset=["spread"]).reset_index(drop=True)
 
     # ---- aggregate ----
     summary = (
