@@ -101,6 +101,15 @@
   </header>
 
   <section>
+    <h2>What changed this week</h2>
+    <p class="note">Quadrant crossings over the last 5 sessions — the backtest says the signal lives in these
+      transitions, not the levels. Plus stocks whose relationship to the index itself is shifting: 90-day vs
+      365-day correlation to NIFTY / BANKNIFTY.</p>
+    <div class="grid2" id="alertCards"></div>
+    <div class="grid2" id="indexShiftCards" style="margin-top:18px"></div>
+  </section>
+
+  <section>
     <h2>Sector rotation</h2>
     <p class="note">Horizontal: current monthly momentum score (strength). Vertical: change over the last
       21 sessions (direction). Bubbles sized by number of stocks. Top-right is <b>leading</b>, bottom-right is
@@ -191,6 +200,47 @@ function hideTip() { tooltip.style.display = "none"; }
     <div class="tile"><div class="tile-label">21-session drift</div><div class="tile-value ${dir}">${t.medianDelta>0?"+":""}${t.medianDelta}</div><div class="tile-sub">median momentum change</div></div>
     <div class="tile"><div class="tile-label">Relationships</div><div class="tile-value">${ec.stable||0}</div>
       <div class="tile-sub">stable · ${ec.emerging||0} emerging · ${ec.fading||0} fading</div></div>`;
+})();
+
+/* ---------- what changed this week ---------- */
+(function alerts() {
+  const KINDS = [
+    { kind:"entry",       title:"Entries · Improving → Leading",          color:"var(--leading)" },
+    { kind:"watch",       title:"Watchlist · Lagging → Improving",        color:"var(--improving)" },
+    { kind:"take-profit", title:"Take-profit · Leading → Weakening",      color:"var(--weakening)" },
+    { kind:"exit",        title:"Breakdowns · Weakening → Lagging",       color:"var(--lagging)" },
+  ];
+  const cross = DATA.transitions.crossings.filter(c => c.kind);
+  $("#alertCards").innerHTML = KINDS.map(k => {
+    const items = cross.filter(c => c.kind === k.kind);
+    const rows = items.length ? items.map(c => `
+        <tr><td><button class="linklike" data-sym="${esc(c.symbol)}">${esc(c.symbol)}</button></td>
+        <td>${esc(c.sector)}</td><td>${fmt(c.score,0)}</td>
+        <td class="${c.week_change>=0?"pos":"neg"}">${c.week_change>0?"+":""}${fmt(c.week_change,0)}</td></tr>`).join("")
+      : `<tr><td colspan="4" style="color:var(--faint)">none this week</td></tr>`;
+    return `<div class="table-wrap"><table>
+      <thead><tr><th colspan="4" style="color:${k.color};font-size:10.5px">${k.title}</th></tr>
+      <tr><th>Symbol</th><th>Sector</th><th>Score</th><th>Δ week</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;
+  }).join("");
+  $("#alertCards").querySelectorAll("[data-sym]").forEach(b =>
+    b.addEventListener("click", () => { selectStock(b.dataset.sym); $("#explorerSection").scrollIntoView({behavior:"smooth"}); }));
+
+  $("#indexShiftCards").innerHTML = DATA.indexShifts.map(sh => {
+    const row = (r, cls) => `
+      <tr><td><button class="linklike" data-sym="${esc(r.symbol)}">${esc(r.symbol)}</button></td>
+      <td>${fmt(r.c365,2)}</td><td>${fmt(r.c90,2)}</td>
+      <td class="${cls}">${r.shift>0?"+":""}${fmt(r.shift,2)}</td></tr>`;
+    const dec = sh.decoupling.map(r => row(r, "neg")).join("");
+    const rec = sh.recoupling.map(r => row(r, "pos")).join("");
+    return `<div class="table-wrap"><table>
+      <thead><tr><th colspan="4" style="font-size:10.5px">Relationship to ${esc(sh.index)} · decoupling / recoupling</th></tr>
+      <tr><th>Symbol</th><th>corr 365d</th><th>corr 90d</th><th>Shift</th></tr></thead>
+      <tbody>${dec + rec || `<tr><td colspan="4" style="color:var(--faint)">no significant shifts</td></tr>`}</tbody>
+      </table></div>`;
+  }).join("");
+  $("#indexShiftCards").querySelectorAll("[data-sym]").forEach(b =>
+    b.addEventListener("click", () => { selectStock(b.dataset.sym); $("#explorerSection").scrollIntoView({behavior:"smooth"}); }));
 })();
 
 /* ---------- quadrant scatter ---------- */

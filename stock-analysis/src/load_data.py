@@ -11,7 +11,11 @@ def load_raw(path: str | Path) -> pd.DataFrame:
     D/W/M/Q are momentum/relative-strength scores over daily/weekly/monthly/
     quarterly lookbacks (roughly -500..+500), not returns.
     """
-    df = pd.read_excel(path, sheet_name=0)
+    path = Path(path)
+    if path.suffix == ".parquet":
+        df = pd.read_parquet(path)
+    else:
+        df = pd.read_excel(path, sheet_name=0)
     df.columns = [str(c).strip() for c in df.columns]
     df = df.rename(columns={df.columns[1]: "Symbol"})
     df["Date"] = pd.to_datetime(df["Date"])

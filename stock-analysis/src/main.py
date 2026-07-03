@@ -27,6 +27,7 @@ from relationships import classify_edges, correlation_matrix, index_exposure
 from rotation import sector_rotation, stock_rotation
 from sector_strength import sector_strength_timeseries
 from sectors import INDEX_SYMBOLS, get_sector
+from transitions import alerts_markdown, edge_changes, index_relationship_shifts, quadrant_transitions
 
 LONG_WINDOW = 365
 SHORT_WINDOW = 90
@@ -53,6 +54,26 @@ def build_analysis(input_path: str) -> dict:
     edges = classify_edges(corr_long, corr_short, threshold=EDGE_THRESHOLD)
     tag_counts = edges["tag"].value_counts().to_dict()
     print(f"Edges: {len(edges)} strong pairs -> {tag_counts}")
+
+    # ---- what changed vs a week ago ----
+    print("Computing week-over-week transitions ...")
+    trans = quadrant_transitions(df, lookback_sessions=5)
+    dates_all = sorted(df["Date"].unique())
+    prev_asof = pd.Timestamp(dates_all[-6]) if len(dates_all) > 6 else as_of
+    r_long_prev = returns[(returns.index >= prev_asof - pd.Timedelta(days=LONG_WINDOW)) & (returns.index <= prev_asof)]
+    r_short_prev = returns[(returns.index >= prev_asof - pd.Timedelta(days=SHORT_WINDOW)) & (returns.index <= prev_asof)]
+    edges_prev = classify_edges(
+        correlation_matrix(r_long_prev, min_obs=120),
+        correlation_matrix(r_short_prev, min_obs=40),
+        threshold=EDGE_THRESHOLD,
+    )
+    edge_delta = edge_changes(edges, edges_prev)
+    idx_shifts = [
+        index_relationship_shifts(corr_long, corr_short, "NIFTY"),
+        index_relationship_shifts(corr_long, corr_short, "BANKNIFTY"),
+    ]
+    n_action = sum(1 for c in trans["crossings"] if c["kind"])
+    print(f"  {n_action} actionable crossings, {len(edge_delta['newEmerging'])} new emerging pairs")
 
     # ---- rotation ----
     stock_rot = stock_rotation(df, score_col="M", delta_sessions=21)
@@ -138,6 +159,9 @@ def build_analysis(input_path: str) -> dict:
             "edgeCounts": {k: int(v) for k, v in tag_counts.items()},
             "agreementARI": round(agreement, 3),
         },
+        "transitions": trans,
+        "edgeChanges": edge_delta,
+        "indexShifts": idx_shifts,
         "sectorRotation": sector_rot.to_dict("records"),
         "stockRotation": stock_rot.drop(columns=["industry"]).to_dict("records"),
         "stocks": stocks,
@@ -167,14 +191,27 @@ def run(input_path: str, outdir: str) -> None:
         json.dump(analysis, f, separators=(",", ":"))
     print(f"analysis.json: {(out / 'analysis.json').stat().st_size / 1024:.0f} KB")
 
+    digest = alerts_markdown(
+        analysis["transitions"], analysis["edgeChanges"], analysis["asOf"], analysis["indexShifts"]
+    )
+    (out / "alerts.md").write_text(digest)
+
     build_dashboard_html(analysis, str(out / "dashboard.html"))
     print(f"dashboard.html: {(out / 'dashboard.html').stat().st_size / 1024:.0f} KB")
     print(f"Done. Outputs in {out}/")
 
 
+def default_input() -> str:
+    """Prefer the compact parquet committed to the repo (survives fresh
+    clones); fall back to the raw xlsx export."""
+    here = Path(__file__).parent.parent
+    parquet = here / "data" / "NIFTY_FO.parquet"
+    return str(parquet) if parquet.exists() else str(here / "data" / "raw" / "NIFTY_FO.xlsx")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", default="data/raw/NIFTY_FO.xlsx")
+    parser.add_argument("--input", default=default_input())
     parser.add_argument("--outdir", default="outputs")
     args = parser.parse_args()
     run(args.input, args.outdir)
