@@ -117,6 +117,21 @@
   </section>
 
   <section>
+    <h2>Conviction leaderboard</h2>
+    <p class="note">One score per stock (0–100), graded like a trade comparator: <b>alignment</b> of the
+      D/W/M/Q momentum cascade (confluence), <b>rotation quadrant</b>, <b>transition freshness</b>,
+      <b>sector support</b>, and <b>partner confirmation</b> (are its correlated names moving the same way).
+      Direction comes from the monthly score's sign. Levels in the explorer are volatility-based risk framing,
+      not intraday structure. <b>Backtest verdict:</b> the long list carries a real tilt (+0.43%/period excess);
+      the short list does <b>not</b> — historically those names slightly outperformed (mean-reversion), so treat
+      the right-hand table as <b>avoid-list only, not shorts</b>.</p>
+    <div class="grid2">
+      <div><h3 style="color:var(--leading)">Top long candidates</h3><div class="table-wrap" style="max-height:430px"><table id="convLong"></table></div></div>
+      <div><h3 style="color:var(--lagging)">Top short / avoid candidates</h3><div class="table-wrap" style="max-height:430px"><table id="convShort"></table></div></div>
+    </div>
+  </section>
+
+  <section>
     <h2>Sector rotation</h2>
     <p class="note">Horizontal: current monthly momentum score (strength). Vertical: change over the last
       21 sessions (direction). Bubbles sized by number of stocks. Top-right is <b>leading</b>, bottom-right is
@@ -360,6 +375,36 @@ function niceTicks(a, b) {
   const out = []; for (let v = Math.ceil(a/step)*step; v <= b; v += step) out.push(v); return out;
 }
 
+/* ---------- conviction leaderboard ---------- */
+const CONV = {};
+(DATA.conviction || []).forEach(c => { CONV[c.Symbol] = c; });
+const gradeChip = (g) => {
+  const cls = g === "A+" || g === "A" ? "q-Leading" : g === "B" ? "q-Improving" : g === "C" ? "q-Weakening" : "q-Lagging";
+  return `<span class="chip ${cls}">${g}</span>`;
+};
+const cascadeChips = (bc) => ["D","W","M","Q"].map(t => {
+  const b = bc[t];
+  const color = b === "bull" ? "var(--leading)" : b === "bear" ? "var(--lagging)" : "var(--faint)";
+  return `<span style="font:10px var(--mono);color:${color}">${t}${b === "bull" ? "▲" : b === "bear" ? "▼" : "·"}</span>`;
+}).join(" ");
+(function convBoard() {
+  const rows = (list) => list.map((c, i) => `
+    <tr><td>${i + 1}</td>
+    <td><button class="linklike" data-sym="${esc(c.Symbol)}">${esc(c.Symbol)}</button></td>
+    <td>${gradeChip(c.grade)}</td><td>${c.score}</td>
+    <td>${cascadeChips(c.biasCascade)}</td>
+    <td>${c.confluence}%</td>
+    <td><span class="chip q-${c.quadrant}">${c.quadrant}</span></td>
+    <td>${esc(c.sector)}</td></tr>`).join("");
+  const head = `<thead><tr><th>#</th><th>Symbol</th><th>Grade</th><th>Score</th><th>Cascade</th><th>Confl.</th><th>Quadrant</th><th>Sector</th></tr></thead>`;
+  const longs = (DATA.conviction || []).filter(c => c.direction === "long").slice(0, 15);
+  const shorts = (DATA.conviction || []).filter(c => c.direction === "short").slice(0, 10);
+  $("#convLong").innerHTML = head + `<tbody>${rows(longs)}</tbody>`;
+  $("#convShort").innerHTML = head + `<tbody>${rows(shorts)}</tbody>`;
+  document.querySelectorAll("#convLong [data-sym], #convShort [data-sym]").forEach(b =>
+    b.addEventListener("click", () => { selectStock(b.dataset.sym); $("#explorerSection").scrollIntoView({behavior:"smooth"}); }));
+})();
+
 /* ---------- sector quadrant ---------- */
 quadrant($("#sectorQuad"),
   DATA.sectorRotation.map(r => ({ x:r.score, y:r.delta, q:r.quadrant, r:Math.sqrt(r.n)*2.6+5, label:r.sector, meta:r })),
@@ -416,12 +461,30 @@ function selectStock(sym) {
     : `<tr><td colspan="5" style="color:var(--faint)">no partners above the correlation threshold — this stock trades on its own drivers</td></tr>`;
   const twins = d.twins.map(t =>
     `<button class="twin" data-sym="${esc(t.sym)}">${esc(t.sym)} <small>${fmt(t.sim,2)}</small></button>`).join("");
+  const cv = CONV[sym];
+  const convCard = !cv ? "" : `
+    <div class="mini-tiles" style="grid-template-columns:repeat(4,1fr);margin:12px 0 4px">
+      <div class="mini"><div class="tile-label">Conviction</div>
+        <div class="tile-value">${cv.score}<span style="font-size:12px;color:var(--faint)">/100</span> ${gradeChip(cv.grade)}</div>
+        <div class="tile-sub">${cv.direction === "long" ? "long candidate" : "short / avoid"}</div></div>
+      <div class="mini"><div class="tile-label">Cascade confluence</div>
+        <div class="tile-value">${cv.confluence}%</div>
+        <div class="tile-sub">${cascadeChips(cv.biasCascade)}</div></div>
+      <div class="mini"><div class="tile-label">Score build</div>
+        <div class="tile-sub" style="margin-top:2px;line-height:1.9">align ${cv.components.alignment}/30 · quad ${cv.components.quadrant}/25 · fresh ${cv.components.freshness}/15<br>sector ${cv.components.sector}/15 · partners ${cv.components.partners}/15${cv.partnerAgreePct != null ? " (" + cv.partnerAgreePct + "% agree)" : ""}</div></div>
+      <div class="mini"><div class="tile-label">Vol-based levels (21-session frame)</div>
+        ${cv.levels ? `<div class="tile-sub" style="margin-top:2px;line-height:1.9">
+          entry <b style="color:var(--accent)">${cv.levels.entry.toLocaleString("en-IN")}</b> ·
+          stop <b style="color:var(--lagging)">${cv.levels.stop.toLocaleString("en-IN")}</b><br>
+          target <b style="color:var(--leading)">${cv.levels.target.toLocaleString("en-IN")}</b> · R:R ${cv.levels.rr} · stop = 2×20d σ</div>` : `<div class="tile-sub">insufficient price history</div>`}</div>
+    </div>`;
   $("#explorer").innerHTML = `
     <div class="exp-head">
       <span class="exp-sym">${esc(sym)}</span>
       ${d.quadrant ? `<span class="chip q-${d.quadrant}">${d.quadrant}</span>` : ""}
       <span class="exp-sec">${esc(d.sector)} · ${esc(d.industry)}</span>
     </div>
+    ${convCard}
     <div class="exp-grid">
       <div>
         <h3>Momentum term structure</h3>

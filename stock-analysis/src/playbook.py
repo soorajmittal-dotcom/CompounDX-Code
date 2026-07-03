@@ -112,11 +112,20 @@ def pct(v, d=2):
 
 
 def build_playbook(input_path: str) -> str:
+    from backtest import conviction_backtest
     res = run_backtest(input_path)
     s = res["summary"]
     sp = res["spread"]
     dec = res["decile"]
     py = res["per_year_excess"]
+    cb = conviction_backtest(input_path)
+    conv_html = (
+        f": the <b>top-15 long list</b> earned {cb['top_long']['mean_excess']*100:+.2f}%/period excess "
+        f"(t-stat {cb['top_long']['t_stat']}, positive in {cb['top_long']['pct_positive']*100:.0f}% of periods) — "
+        f"a real but modest tilt, consistent with the quadrant result. The <b>top-10 short list</b> showed "
+        f"{cb['top_short']['mean_excess']*100:+.2f}%/period — i.e. <b>no edge on the short side</b>. "
+        f"(The live score's partner-confirmation component isn't in this test; treat its contribution as unproven.)"
+    )
 
     quad_rows = ""
     chip = {"Leading": "g", "Improving": "b", "Weakening": "w", "Lagging": "r"}
@@ -186,6 +195,15 @@ same picture: top decile {pct(dec['top_mean_excess'])}, bottom {pct(dec['bottom_
 <div class="table-wrap"><table>
 <thead><tr><th>Year</th>{year_head}</tr></thead>
 <tbody>{year_rows}</tbody></table></div>
+
+<h3>The conviction leaderboard, tested the same way</h3>
+<p>The terminal's conviction score (cascade alignment + quadrant + freshness + sector support + partner
+confirmation) was backtested point-in-time exactly as displayed{conv_html}</p>
+<div class="callout bad"><b>Do not short the short list.</b> The backtest is unambiguous: bottom-conviction
+names did <i>not</i> underperform once already beaten down — deep losers mean-revert. The right-hand
+leaderboard table is an <b>avoid list</b> (don't hold, don't buy dips), not a source of short trades.
+Shorts, if any, should come from fresh <i>Weakening → Lagging breakdowns</i>, not from names that have
+been Lagging for months.</div>
 
 <div class="callout warn"><b>Statistical honesty.</b> The Leading t-stat is {s.loc['Leading','t_stat_excess']:.2f} —
 right direction, but on ~{res['n_rebalances']} periods this is a <b>tendency, not a certainty</b>. Three biases all

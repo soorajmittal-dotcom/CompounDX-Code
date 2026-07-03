@@ -20,6 +20,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from conviction import conviction_table
 from dashboard import build_dashboard_html
 from embeddings import build_embeddings, cluster_embeddings, latent_neighbors, sector_cluster_agreement
 from load_data import daily_returns, load_raw, price_panel
@@ -133,6 +134,18 @@ def build_analysis(input_path: str) -> dict:
             "betaBank": _f(idx_exp, sym, "beta_BANKNIFTY"),
         }
 
+    # ---- conviction scores (multi-timeframe cascade + rotation + partners) ----
+    conv = conviction_table(
+        momentum_latest=momentum_latest,
+        stock_rot=stock_rot,
+        sector_rot=sector_rot,
+        crossings=trans["crossings"],
+        partners=edge_lookup,
+        price=price,
+    )
+    print(f"Conviction: {len(conv)} scored, "
+          f"{(conv['grade'].isin(['A+', 'A'])).sum()} at grade A or better")
+
     # ---- sector strength history (monthly) ----
     sector_ts = sector_strength_timeseries(df, col="M").resample("MS").mean().round(1)
 
@@ -169,6 +182,7 @@ def build_analysis(input_path: str) -> dict:
                 r_long, {s: get_sector(s)[0] for s in corr_long.columns if s not in INDEX_SYMBOLS}
             ),
         },
+        "conviction": conv.to_dict("records"),
         "sectorRotation": sector_rot.to_dict("records"),
         "stockRotation": stock_rot.drop(columns=["industry"]).to_dict("records"),
         "stocks": stocks,
