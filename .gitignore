@@ -45,3 +45,4 @@ npm-debug.log*
 htmlcov/
 .coverage
 coverage/
+trend_following/output/
